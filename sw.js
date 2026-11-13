@@ -1,9 +1,9 @@
-// Rico Finances AI offline-first service worker — v1.8.2
+// Rico Finances AI offline-first service worker — v1.8.3
 // Works on GitHub Pages root sites and subdirectory project sites.
-const CACHE_NAME = 'private-rico-ai-shell-v1.8.2';
+const CACHE_NAME = 'private-rico-ai-shell-v1.8.3';
 const CACHE_PREFIX = 'private-rico-ai-shell-';
 const APP_SHELL = [
-  './', './index.html', './styles.css', './icons.js', './analyst.js', './ai-config.js', './ask-ai.js',
+  './', './index.html', './styles.css', './icons.js', './analyst.js', './ai-config.js', './ask-ai-v1.8.3.js',
   './manifest.webmanifest', './version.json',
   './my-finances-icon-192.png', './my-finances-icon-512.png', './my-finances-maskable-512.png',
   './my-finances-apple-touch-icon.png', './favicon-48.png'
@@ -75,8 +75,9 @@ self.addEventListener('fetch', event => {
         if (fresh.ok) return fresh;
         throw new Error('No fresh page');
       } catch (_error) {
-        return (await caches.match('./index.html')) ||
-               (await caches.match('./')) ||
+        const cache=await caches.open(CACHE_NAME);
+        return (await cache.match('./index.html')) ||
+               (await cache.match('./')) ||
                new Response('Rico Finances AI requires one successful online installation.',
                  {status:503, headers:{'Content-Type':'text/plain; charset=utf-8'}});
       }
@@ -85,13 +86,13 @@ self.addEventListener('fetch', event => {
   }
   // Same-origin app files: cache-first, with network recovery for not-yet-cached extras.
   event.respondWith((async () => {
-    const cached=await caches.match(request, {ignoreSearch:true});
+    const cache=await caches.open(CACHE_NAME);
+    const cached=await cache.match(request, {ignoreSearch:true});
     if (cached) return cached;
     try {
       const fresh=await fetch(request);
       // Cache only same-origin successful responses, without touching other apps.
       if (fresh.ok && fresh.type === 'basic') {
-        const cache=await caches.open(CACHE_NAME);
         await cache.put(request, fresh.clone());
       }
       return fresh;

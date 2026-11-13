@@ -22,7 +22,7 @@
 .pb-safe{padding-bottom:env(safe-area-inset-bottom,20px)}
 .pt-safe{padding-top:env(safe-area-inset-top,20px)}
 
-/* Rico Finances AI v1.8.2 compact 3-line header: app title + actions, greeting, date + connection status. */
+/* Rico Finances AI v1.8.3 compact 3-line header: app title + actions, greeting, date + connection status. */
 #appHeader{position:sticky;top:0;z-index:40;background:rgba(0,0,0,.94);border-bottom:1px solid #2c2c2e;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 #appHeader .app-header-inner{width:100%;max-width:448px;margin:0 auto;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 7px;box-sizing:border-box}
 #appHeader .app-header-primary{display:flex!important;align-items:center;min-width:0}
@@ -90,7 +90,7 @@ body.personalization-open,body.ai-analyst-open{overflow:hidden;touch-action:pan-
 body.ask-ai-open{overflow:hidden}
 
 
-/* Rico Finances AI v1.8.2: familiar private messenger conversation. */
+/* Rico Finances AI v1.8.3: familiar private messenger conversation. */
 .ask-ai-dialog{padding:10px!important;box-sizing:border-box}
 .ask-ai-panel.ask-ai-messenger{display:flex;flex-direction:column;width:100%;max-width:550px;height:min(790px,calc(100dvh - 20px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));max-height:100%;overflow:hidden;padding:0!important;background:#101217;border:1px solid #393c46;border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.83)}
 .rico-chat-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;background:#181b25;border-bottom:1px solid #343744;padding:12px 14px}
@@ -134,7 +134,7 @@ body.ask-ai-open{overflow:hidden}
 @media(max-height:550px){.rico-chat-compose-area .rico-chat-check small{display:none}.rico-chat-messages{min-height:40px}}
 </style>
 <script src="ai-config.js" defer></script>
-<script src="ask-ai.js" defer></script>
+<script src="ask-ai-v1.8.3.js" defer></script>
 </head>
 <body class="bg-black text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-iosBlue selection:text-white pb-safe">
 
@@ -287,7 +287,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.2</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.3</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -431,7 +431,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 
-<!-- Read-only paid Ask AI via existing shared Worker. Messenger interface v1.8.2. -->
+<!-- Read-only paid Ask AI via existing shared Worker. Messenger interface v1.8.3. -->
 <div id="askAiDialog" class="ask-ai-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="askAiTitle">
   <section class="ask-ai-panel ask-ai-messenger" tabindex="-1">
     <header class="rico-chat-header">
@@ -459,7 +459,7 @@ body.ask-ai-open{overflow:hidden}
         <div class="rico-chat-composer">
           <label for="askAiQuestion" class="rico-sr-only">Message Ask Rico</label>
           <textarea id="askAiQuestion" rows="1" maxlength="800" placeholder="Ask Rico anything about your finances…"></textarea>
-          <button id="askAiSendButton" type="button" aria-label="Send message" title="Send to paid Ask Rico" onclick="sendAskAiQuestion()">➤</button>
+          <button id="askAiSendButton" type="button" aria-label="Send message" title="Send to paid Ask Rico" >➤</button>
         </div>
         <p class="rico-chat-hint">Enter to send · Shift+Enter for a new line · Online only</p>
       </div>
@@ -469,7 +469,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.2';
+const RICO_APP_VERSION = '1.8.3';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
