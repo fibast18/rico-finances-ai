@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Rico Finances AI - Private Cash Flow Tracker</title>
+<link rel="apple-touch-icon" sizes="180x180" href="my-finances-apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="Personal offline cash flow tracker. Your transactions stay on this device.">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rico Finances AI" id="iosAppTitle">
+<link rel="stylesheet" href="styles.css">
+<script src="icons.js"></script>
+<script src="analyst.js" defer></script>
+<style>
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,.1)}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:10px}
+.pb-safe{padding-bottom:env(safe-area-inset-bottom,20px)}
+.pt-safe{padding-top:env(safe-area-inset-top,20px)}
+
+/* Rico Finances AI v1.8.0 compact 3-line header: app title + actions, greeting, date + connection status. */
+#appHeader{position:sticky;top:0;z-index:40;background:rgba(0,0,0,.94);border-bottom:1px solid #2c2c2e;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+#appHeader .app-header-inner{width:100%;max-width:448px;margin:0 auto;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 7px;box-sizing:border-box}
+#appHeader .app-header-primary{display:flex!important;align-items:center;min-width:0}
+#appHeader .app-header-person{display:flex!important;align-items:center;gap:10px;min-width:0;flex:1 1 auto;overflow:visible}
+#appHeader #profileLogo{width:78px!important;height:78px!important;min-width:78px!important;max-width:78px!important;max-height:78px!important;min-height:78px!important;aspect-ratio:1/1;object-fit:cover;flex:0 0 78px;display:block;border-radius:50%;border:2px solid #0a84ff;background:#1c1c1e}
+#appHeader .app-header-copy{flex:1 1 auto;min-width:0;max-width:100%;overflow:visible}
+#appHeader .app-header-top-row,#appHeader .app-header-bottom-row{display:flex;align-items:center;justify-content:space-between;gap:7px;min-width:0;width:100%}
+#appHeader #appHeaderTitle{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;display:block;color:#fff;font-size:18px;font-weight:800;letter-spacing:.1px;line-height:1.3;margin:0;min-width:0;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#appHeader #userGreeting{display:block;color:#e5e5ea;font-size:16.8px;font-weight:650;line-height:1.28;margin:3px 0 2px;overflow-wrap:anywhere}
+#appHeader #currentDateLine{display:block;color:#aeb0b8;font-size:12.5px;font-weight:500;line-height:1.35;margin:0;min-width:0;flex:1 1 auto;letter-spacing:.05px;white-space:nowrap}
+#appHeader .app-settings-btn{flex:0 0 42px;display:flex;justify-content:center;align-items:center;width:42px;height:42px;border-radius:14px;color:#f2f2f7;background:#1c1c1e;border:1px solid #3a3a3c;cursor:pointer;touch-action:manipulation}
+#appHeader .app-settings-btn svg{width:22px;height:22px}
+#appHeader .app-header-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+#appHeader .app-ai-btn{display:flex;justify-content:center;align-items:center;gap:2px;flex:0 0 42px;width:42px;height:42px;border-radius:14px;color:#dfc4ff;background:#261d32;border:1px solid #684b89;font-weight:800;font-size:14px;cursor:pointer;touch-action:manipulation}
+#appHeader .app-ai-btn .ai-button-star{font-size:10px;align-self:flex-start;margin-top:10px}
+#appHeader .app-ai-btn:focus-visible,#appHeader .app-settings-btn:focus-visible{outline:2px solid #bf8cff;outline-offset:2px}
+#appHeader .app-header-secondary{display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;margin:0;min-height:0}
+#appHeader #syncStatusBadge{width:auto;max-width:max-content;white-space:nowrap;padding:5px 8px;font-size:10px}
+.floating-add-btn{position:fixed!important;left:18px!important;bottom:calc(24px + env(safe-area-inset-bottom,0px))!important;z-index:45!important;display:flex!important;width:66px!important;height:66px!important;border-radius:50%!important;align-items:center!important;justify-content:center!important;background:#0a84ff!important;color:#fff!important;border:1px solid rgba(255,255,255,.24);box-shadow:0 9px 30px rgba(10,132,255,.42)!important;cursor:pointer;touch-action:manipulation;transition:transform .15s ease,box-shadow .15s ease}
+.floating-add-btn:active{transform:scale(.94)}.floating-add-btn svg{width:32px!important;height:32px!important;stroke-width:2.5}
+body>main{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}
+.personalization-dialog{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));box-sizing:border-box}
+.personalization-dialog.hidden{display:none!important}
+.personalization-panel{width:100%;max-width:430px;max-height:100%;overflow-y:auto;overscroll-behavior:contain;border-radius:24px;box-shadow:0 25px 70px rgba(0,0,0,.7);-webkit-overflow-scrolling:touch;background:#1c1c1e}
+#personalizeAppSection{width:100%;margin:0;background:#1c1c1e}
+.app-settings-modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid #353537}
+.app-settings-modal-header h2{font-size:18px;font-weight:750;color:#fff;margin:0}
+.app-settings-close{display:flex;justify-content:center;align-items:center;flex:0 0 36px;width:36px;height:36px;border-radius:50%;background:#303034;color:white;border:1px solid #444;cursor:pointer}
+body.personalization-open,body.ai-analyst-open{overflow:hidden;touch-action:pan-y}
+.ai-analyst-dialog{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));box-sizing:border-box;background:rgba(0,0,0,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.ai-analyst-dialog.hidden{display:none!important}
+.ai-analyst-modal-panel{width:100%;max-width:430px;max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:24px;box-shadow:0 25px 70px rgba(0,0,0,.7)}
+#aiAnalystSection{margin:0}
+#aiAnalystSection .ai-analyst-heading{align-items:center;gap:7px}
+#aiAnalystSection .ai-analyst-heading>div{min-width:0;flex:1}
+#aiAnalystSection .ai-analyst-offline{font-size:9px;padding:4px 6px;flex-shrink:0}
+.ai-analyst-close{display:flex;align-items:center;justify-content:center;flex:0 0 35px;width:35px;height:35px;border-radius:50%;background:#35303d;color:#fff;border:1px solid #62506d;cursor:pointer;touch-action:manipulation}
+.ai-analyst-close svg{width:18px;height:18px}
+.ai-analyst-close:focus-visible{outline:2px solid #bf8cff;outline-offset:2px}
+@media(max-width:385px){#appHeader #profileLogo{width:62px!important;height:62px!important;min-width:62px!important;max-width:62px!important;max-height:62px!important;min-height:62px!important;flex-basis:62px}#appHeader .app-header-person{gap:8px}#appHeader .app-header-inner{padding-left:10px;padding-right:10px}#appHeader #appHeaderTitle{font-size:16px}#appHeader #userGreeting{font-size:15px}#appHeader #currentDateLine{font-size:11px}#appHeader .app-ai-btn,#appHeader .app-settings-btn{width:37px;height:37px;flex-basis:37px}#appHeader .app-header-actions{gap:4px}#appHeader #syncStatusBadge{font-size:9px;padding:4px 6px}#appHeader #syncDot{width:6px;height:6px}}
+@media(max-width:340px){#appHeader #currentDateLine{font-size:10px;letter-spacing:-.3px}#appHeader #profileLogo{width:54px!important;height:54px!important;min-width:54px!important;max-width:54px!important;max-height:54px!important;min-height:54px!important;flex-basis:54px}#appHeader .app-header-person{gap:7px}#appHeader .app-header-actions{gap:3px}#appHeader .app-ai-btn,#appHeader .app-settings-btn{width:33px;height:33px;flex-basis:33px;border-radius:11px}#appHeader #appHeaderTitle{font-size:14px}#appHeader #userGreeting{font-size:13px}}
+
+/* Private edition top row: three icon actions fit on small iPhones. */
+#appHeader #profileLogo{width:62px!important;height:62px!important;min-width:62px!important;max-width:62px!important;max-height:62px!important;min-height:62px!important;flex-basis:62px!important}
+#appHeader .app-header-inner{padding-left:10px;padding-right:10px}
+#appHeader .app-header-person{gap:8px}
+#appHeader #appHeaderTitle{font-size:16px!important;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#appHeader #userGreeting{font-size:14px!important;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#appHeader .app-header-actions{gap:4px;flex-shrink:0}
+#appHeader .app-ai-btn,#appHeader .app-settings-btn,#appHeader .app-ask-ai-btn{width:34px!important;height:34px!important;flex:0 0 34px!important;border-radius:11px}
+#appHeader .app-ask-ai-btn{display:flex;align-items:center;justify-content:center;border:1px solid #287fca;background:#10283e;color:#6ec9ff;font-size:11px;font-weight:900;cursor:pointer}
+#appHeader .app-ai-btn .ai-button-star{margin-top:7px}
+#appHeader #currentDateLine{font-size:11px!important}
+@media(max-width:355px){#appHeader #profileLogo{width:50px!important;height:50px!important;min-width:50px!important;max-width:50px!important;max-height:50px!important;min-height:50px!important;flex-basis:50px!important}#appHeader #appHeaderTitle{font-size:13px!important}#appHeader #userGreeting{font-size:12px!important}#appHeader .app-ai-btn,#appHeader .app-settings-btn,#appHeader .app-ask-ai-btn{width:30px!important;height:30px!important;flex-basis:30px!important}#appHeader .app-header-person{gap:6px}}
+.ask-ai-panel{width:100%;max-width:430px;max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:#17171c;border:1px solid #393b46;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.8);padding:17px}
+.ask-ai-dialog{position:fixed;inset:0;z-index:110;display:flex;align-items:center;justify-content:center;padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(0,0,0,.84);-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px)}
+.ask-ai-dialog.hidden{display:none!important}
+.ask-ai-field{width:100%;border:1px solid #434755;border-radius:12px;background:#0d0f16;color:#f9faff;padding:11px;font-size:14px;box-sizing:border-box}
+.ask-ai-btn{padding:10px 12px;border-radius:12px;background:#0a84ff;color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer}
+.ask-ai-btn:disabled{opacity:.5;cursor:wait}
+.ask-ai-secondary{padding:10px 12px;border-radius:12px;background:#292c38;color:#eceefa;border:1px solid #494c58;font-size:12px;cursor:pointer}
+.ask-ai-response{white-space:pre-wrap;overflow-wrap:anywhere;background:#0e1119;border:1px solid #343e50;border-radius:13px;padding:12px;min-height:78px;font-size:13px;line-height:1.5;color:#ecf4ff;max-height:35vh;overflow-y:auto}
+.ask-ai-helper{font-size:11px;line-height:1.45;color:#abb4c9}
+.ask-ai-label{font-size:12px;font-weight:650;color:#d6dff3;margin:0 0 5px}
+body.ask-ai-open{overflow:hidden}
+
+</style>
+<script src="ai-config.js" defer></script>
+<script src="ask-ai.js" defer></script>
+</head>
+<body class="bg-black text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-iosBlue selection:text-white pb-safe">
+
+<header id="appHeader" class="sticky top-0 z-40 bg-black/90 backdrop-blur-xl border-b border-iosBorderDark">
+  <div class="app-header-inner max-w-md mx-auto">
+    <div class="app-header-primary">
+      <div class="app-header-person">
+        <img id="profileLogo" src="my-finances-icon-192.png" alt="App profile photo" class="app-header-logo rounded-full object-cover border-2 border-iosBlue shadow-sm" width="78" height="78" style="object-fit:cover;aspect-ratio:1/1">
+        <div class="app-header-copy">
+          <div class="app-header-top-row">
+            <h1 id="appHeaderTitle">Rico Finances AI</h1>
+            <div class="app-header-actions">
+              <button id="aiAnalystButton" type="button" aria-label="Open AI Analyst" title="AI Analyst" aria-haspopup="dialog" aria-controls="aiAnalystDialog" onclick="openAIAnalyst()" class="app-ai-btn">
+                <span class="ai-button-star" aria-hidden="true">✦</span><span aria-hidden="true">AI</span>
+              </button>
+              <button id="askAiButton" type="button" aria-label="Ask paid OpenAI" title="Private Ask AI" aria-haspopup="dialog" aria-controls="askAiDialog" onclick="openAskAi()" class="app-ask-ai-btn">ASK</button>
+              <button id="settingsButton" type="button" aria-label="Personalize app" title="Personalize app" aria-haspopup="dialog" aria-controls="personalizationDialog" onclick="openPersonalization()" class="app-settings-btn">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+              </button>
+            </div>
+          </div>
+          <p id="userGreeting">Good day, Boss Rico J.</p>
+          <div class="app-header-bottom-row">
+            <p id="currentDateLine" aria-label="Today’s date">Monday, Nov. 2, 2026</p>
+            <div class="app-header-secondary">
+              <span id="syncStatusBadge" class="px-2.5 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[10px] font-semibold tracking-wide uppercase text-iosGreen flex items-center gap-1.5">
+                <span id="syncDot" class="w-2 h-2 rounded-full bg-iosGreen animate-pulse"></span>
+                <span id="syncStatusText">Online</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Persistent action control: bottom-left, 1.5x previous 43px header button. -->
+<button id="addTransactionButton" type="button" aria-label="Add transaction" title="Add transaction" onclick="openModal()" class="floating-add-btn" style="position:fixed;left:18px;bottom:calc(24px + env(safe-area-inset-bottom, 0px));width:66px;height:66px;z-index:45;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#0a84ff;color:#fff;box-shadow:0 10px 30px rgba(10,132,255,.4)">
+  <i data-lucide="plus" class="w-8 h-8"></i>
+</button>
+
+<main class="max-w-md mx-auto w-full px-4 py-4 space-y-5 flex-1">
+
+  <!-- Backup reminder banner -->
+  <section id="backupBanner" class="hidden bg-iosOrange/10 border border-iosOrange/30 rounded-2xl p-3 text-xs text-iosOrange flex items-center justify-between gap-2">
+    <span id="backupBannerText">Back up your data.</span>
+    <button onclick="exportData()" class="px-3 py-1.5 rounded-xl bg-iosOrange text-black font-semibold flex-shrink-0">Export now</button>
+  </section>
+
+  <!-- Month Navigation Ribbon -->
+  <section class="flex items-center justify-between bg-iosCardDark rounded-2xl p-3 border border-iosBorderDark select-none">
+    <button onclick="changeMonth(-1)" class="w-8 h-8 rounded-xl bg-black/40 hover:bg-black/70 flex items-center justify-center text-iosGray hover:text-white transition"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+    <div class="text-center">
+      <p id="selectedMonthDisplay" class="text-sm font-bold text-white tracking-wide">October 2026</p>
+    </div>
+    <button onclick="changeMonth(1)" class="w-8 h-8 rounded-xl bg-black/40 hover:bg-black/70 flex items-center justify-center text-iosGray hover:text-white transition"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+  </section>
+
+  <!-- Balance Summary Card with Borderless Stickman -->
+  <section id="balanceSummaryCard" class="bg-gradient-to-br from-iosCardDark via-iosCardDark to-iosGray6 rounded-3xl p-5 border border-iosBorderDark shadow-ios-float relative overflow-hidden select-none">
+    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-iosBlue/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="flex justify-between items-start mb-1">
+      <span class="text-xs font-medium uppercase tracking-wider text-iosGray">Cash on Hand / Balance</span>
+      <span id="cashOnHandStatus" class="px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-iosGreen/10 text-iosGreen border border-iosGreen/20">Healthy</span>
+    </div>
+    <div class="mb-3"><div class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white flex items-baseline gap-1"><span id="netBalanceDisplay">₱0.00</span></div></div>
+
+    <!-- Borderless, Blended Horizontal Entertainment Arena (200+ Actions) -->
+    <div onclick="switchStickmanAction()" class="relative w-full h-12 bg-transparent cursor-pointer overflow-hidden flex items-center px-1 mb-3">
+      <canvas id="stickmanCanvas" width="310" height="42" class="block w-full h-full"></canvas>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-iosBorderDark/60">
+      <div class="bg-black/30 rounded-2xl p-3 border border-iosBorderDark/40">
+        <div class="flex items-center gap-1.5 text-iosGreen text-xs font-medium mb-1">
+          <div class="w-5 h-5 rounded-full bg-iosGreen/20 flex items-center justify-center"><i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i></div>Month Income
+        </div>
+        <p id="totalIncomeDisplay" class="text-lg font-bold text-white">₱0.00</p>
+      </div>
+      <div class="bg-black/30 rounded-2xl p-3 border border-iosBorderDark/40">
+        <div class="flex items-center gap-1.5 text-iosRed text-xs font-medium mb-1">
+          <div class="w-5 h-5 rounded-full bg-iosRed/20 flex items-center justify-center"><i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i></div>Month Expenses
+        </div>
+        <p id="totalExpenseDisplay" class="text-lg font-bold text-white">₱0.00</p>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <div class="flex justify-between text-[11px] text-iosGray mb-1"><span>Month Expense Ratio</span><span id="expenseRatioText">0% of income</span></div>
+      <div class="w-full bg-black/50 h-2 rounded-full overflow-hidden"><div id="expenseRatioBar" class="bg-iosBlue h-full transition-all duration-500 rounded-full" style="width:0%"></div></div>
+    </div>
+  </section>
+
+  <!-- Quick Filter Ribbon -->
+  <section class="flex items-center justify-between gap-2">
+    <div class="flex bg-iosCardDark p-1 rounded-2xl border border-iosBorderDark w-full text-xs font-medium">
+      <button onclick="setFilter('all')" id="filterBtnAll" class="flex-1 py-1.5 rounded-xl transition text-center bg-iosBlue text-white shadow-sm">All</button>
+      <button onclick="setFilter('income')" id="filterBtnIncome" class="flex-1 py-1.5 rounded-xl transition text-center text-iosGray hover:text-white">Income</button>
+      <button onclick="setFilter('expense')" id="filterBtnExpense" class="flex-1 py-1.5 rounded-xl transition text-center text-iosGray hover:text-white">Expenses</button>
+    </div>
+  </section>
+
+  <!-- Expense Breakdown Donut Chart -->
+  <section class="bg-iosCardDark rounded-3xl p-4 border border-iosBorderDark">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-semibold text-white flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-iosPurple"></i>Expense Breakdown</h2>
+      <span id="categoryCountBadge" class="text-xs text-iosGray">0 Categories</span>
+    </div>
+    <div id="analyticsContainer" class="flex items-center gap-4">
+      <div class="w-28 h-28 relative flex-shrink-0"><canvas id="expenseChart"></canvas></div>
+      <div id="categoryLegend" class="flex-1 space-y-1.5 text-xs max-h-28 overflow-y-auto pr-1"></div>
+    </div>
+    <div id="emptyAnalytics" class="hidden text-center py-6 text-iosGray text-xs">No expense data logged for this month.</div>
+  </section>
+
+
+  <!-- Transactions Feed -->
+  <section class="space-y-3">
+    <div class="flex items-center justify-between px-1">
+      <h2 class="text-sm font-semibold text-white flex items-center gap-2"><i data-lucide="list" class="w-4 h-4 text-iosBlue"></i>Transactions</h2>
+      <span id="txCount" class="text-xs text-iosGray">0 items</span>
+    </div>
+    <div class="relative">
+      <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-iosGray"></i>
+      <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="Search description or category..." class="w-full bg-iosCardDark border border-iosBorderDark rounded-2xl pl-9 pr-4 py-2 text-xs text-white placeholder-iosGray focus:outline-none focus:border-iosBlue transition">
+    </div>
+    <div id="transactionList" class="space-y-2"></div>
+    <div id="emptyState" class="hidden text-center py-10 bg-iosCardDark/50 rounded-3xl border border-iosBorderDark/50">
+      <div class="w-12 h-12 rounded-full bg-iosCardDark flex items-center justify-center mx-auto mb-2 text-iosGray"><i data-lucide="receipt" class="w-6 h-6"></i></div>
+      <p class="text-sm font-medium text-white">No transactions for this month</p>
+      <p class="text-xs text-iosGray mt-0.5">Tap the blue + button below to log cash flow.</p>
+    </div>
+  </section>
+
+  <!-- Data Settings & Updates -->
+  <section class="bg-iosCardDark rounded-3xl p-4 border border-iosBorderDark space-y-3">
+    <h3 class="text-xs font-semibold text-iosGray uppercase tracking-wider">Data Settings & Updates</h3>
+    <p id="lastBackupText" class="text-[11px] text-iosGray">Data is stored on this device only.</p>
+    <div class="grid grid-cols-2 gap-2 text-xs">
+      <button onclick="exportData()" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white hover:bg-black/70 transition"><i data-lucide="download" class="w-3.5 h-3.5 text-iosBlue"></i>Export</button>
+      <button onclick="document.getElementById('importFileInput').click()" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white hover:bg-black/70 transition"><i data-lucide="upload" class="w-3.5 h-3.5 text-iosGreen"></i>Import</button>
+      <input type="file" id="importFileInput" onchange="importData(event)" accept=".json" class="hidden">
+    </div>
+    <button type="button" onclick="copyFromSharedFinances()" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray2 hover:text-white transition font-semibold text-xs"><i data-lucide="copy" class="w-3.5 h-3.5"></i>Copy Records from Shared App (This Device)</button>
+    <p class="text-[10px] text-iosGray">Optional: copies records from the original My Finances app only when both apps use the same browser website origin. Does not change the original. Export a backup first.</p>
+    <button onclick="checkForAppUpdates()" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-iosBlue/10 border border-iosBlue/30 text-iosCyan hover:bg-iosBlue/20 transition font-semibold text-xs"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Check for App Update</button>
+  </section>
+</main>
+
+<footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.0</span>
+  </div>
+  <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
+  <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
+</footer>
+
+<!-- AI Analyst stays off the main dashboard and opens only when AI is tapped. -->
+<div id="aiAnalystDialog" class="ai-analyst-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="aiAnalystHeading" aria-hidden="true" onclick="if(event.target===this)closeAIAnalyst()">
+  <div class="ai-analyst-modal-panel" role="document">
+  <!-- AI Analyst: fully on-device and read-only, never uploads or changes transactions. -->
+    <section id="aiAnalystSection" class="ai-analyst-panel" aria-labelledby="aiAnalystHeading">
+    <div class="ai-analyst-heading">
+      <div>
+        <h2 id="aiAnalystHeading" class="ai-analyst-title"><span class="ai-analyst-star" aria-hidden="true">✦</span> AI Analyst</h2>
+        <p class="ai-analyst-subtitle">Your monthly cash flow, explained</p>
+      </div>
+      <span class="ai-analyst-offline">ON-DEVICE</span>
+      <button id="closeAIAnalystButton" type="button" class="ai-analyst-close" onclick="closeAIAnalyst()" aria-label="Close AI Analyst" title="Close AI Analyst"><i data-lucide="x"></i></button>
+    </div>
+    <p id="aiAnalystPeriod" class="ai-analyst-period">Analyzing selected month…</p>
+    <div id="aiAnalystOverview" class="ai-metric-grid" aria-live="polite"></div>
+    <h3 class="ai-analyst-minititle">Key findings</h3>
+    <div id="aiAnalystHighlights" class="ai-analyst-findings" aria-live="polite"></div>
+    <details id="aiAnalystMore" class="ai-analyst-details">
+      <summary>Explore trends &amp; ask the Analyst <span aria-hidden="true">⌄</span></summary>
+      <div class="ai-analyst-expanded">
+        <h3 class="ai-analyst-minititle">Last 6 months · recorded expenses</h3>
+        <div id="aiAnalystTrend" class="ai-analyst-history"></div>
+        <h3 class="ai-analyst-minititle">Ask about this month</h3>
+        <div class="ai-question-grid" role="group" aria-label="Ask financial analyst">
+          <button type="button" onclick="askFinanceAnalyst('summary')">Cash flow</button>
+          <button type="button" onclick="askFinanceAnalyst('spending')">Top spending</button>
+          <button type="button" onclick="askFinanceAnalyst('compare')">Last month</button>
+          <button type="button" onclick="askFinanceAnalyst('savings')">Saving ideas</button>
+        </div>
+        <p id="aiAnalystAnswer" class="ai-analyst-answer" role="status">Choose a question to see an explanation based on your records.</p>
+      </div>
+    </details>
+    <p class="ai-analyst-disclaimer">Free, offline, built-in rule-based analysis—not a cloud AI model. It only reads this device's logged transactions; missing entries affect accuracy. Suggestions are informational, not professional financial advice.</p>
+    </section>
+
+  </div>
+</div>
+
+<!-- Hidden until the top gear is tapped. Kept entirely outside the scrolling feed. -->
+<div id="personalizationDialog" class="personalization-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="personalizationTitle" aria-hidden="true" onclick="if(event.target===this)closePersonalization()">
+  <div class="personalization-panel" role="document">
+  <!-- Per-device personalization. These values never change financial transactions. -->
+<section class="bg-iosCardDark rounded-3xl p-4 border border-iosBorderDark space-y-3" id="personalizeAppSection">
+    <div class="app-settings-modal-header">
+      <h2 id="personalizationTitle">Personalize App</h2>
+      <button id="closePersonalizationButton" type="button" onclick="closePersonalization()" aria-label="Close personalization" class="app-settings-close"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <p class="text-[11px] text-iosGray2">Make this finance tracker your own. These settings are saved privately on this device.</p>
+    <form id="personalizationForm" onsubmit="savePersonalization(event)" class="space-y-3">
+      <div>
+        <label for="customAppName" class="block text-xs text-iosGray2 mb-1">App Name</label>
+        <input id="customAppName" type="text" maxlength="40" required placeholder="e.g. Rico Finances AI" autocomplete="off" class="w-full bg-black/40 border border-iosBorderDark rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-iosBlue transition">
+      </div>
+      <div>
+        <label for="customDisplayName" class="block text-xs text-iosGray2 mb-1">Your Name / Greeting</label>
+        <input id="customDisplayName" type="text" maxlength="48" required placeholder="e.g. Boss Rico J. or Maria" autocomplete="nickname" class="w-full bg-black/40 border border-iosBorderDark rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-iosBlue transition">
+      </div>
+      <button type="submit" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-iosBlue text-white text-xs font-semibold"><i data-lucide="check" class="w-4 h-4"></i>Save App Settings</button>
+    </form>
+    <div class="border-t border-iosBorderDark pt-3 space-y-2">
+      <label for="profileImageInput" class="block text-xs text-iosGray2">Profile Photo / App Header Logo (optional)</label>
+      <div class="flex items-center gap-2">
+        <img id="settingsProfilePreview" src="my-finances-icon-192.png" alt="Current profile logo" class="w-12 h-12 rounded-full object-cover border border-iosBorderDark">
+        <label class="flex-1 cursor-pointer text-center py-2.5 rounded-xl bg-black/40 border border-iosBorderDark text-xs text-white" for="profileImageInput">Choose Photo</label>
+        <button type="button" onclick="removeProfilePhoto()" class="px-3 py-2.5 rounded-xl bg-black/40 border border-iosBorderDark text-xs text-iosGray2">Reset</button>
+        <input type="file" id="profileImageInput" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,image/*" onchange="uploadProfilePhoto(event)" class="hidden">
+      </div>
+      <p id="personalizationMessage" aria-live="polite" class="text-[11px] text-iosGreen"></p>
+      <p class="text-[10px] text-iosGray">Your personalized name and photo appear inside the app. The installed Home Screen name is Rico Finances AI. Existing Home Screen icons may need to be added again to display the new name and logo. Back up data before removing any installed app.</p>
+    </div>
+</section>
+
+  </div>
+</div>
+
+<!-- Safe iPhone backup options: data is never uploaded to a server. -->
+<div id="backupOptionsDialog" class="hidden" role="dialog" aria-modal="true" aria-labelledby="backupOptionsTitle" style="position:fixed;inset:0;z-index:130;background:rgba(0,0,0,.85);padding:calc(20px + env(safe-area-inset-top,0px)) 12px calc(20px + env(safe-area-inset-bottom,0px));overflow-y:auto;align-items:center;justify-content:center">
+  <div style="background:#1c1c1e;color:#fff;border:1px solid #3a3a3d;border-radius:22px;padding:18px;max-width:430px;width:100%;margin:auto;box-sizing:border-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <h2 id="backupOptionsTitle" style="font-size:18px;font-weight:700;margin:0">Export your financial backup</h2>
+      <button type="button" onclick="closeBackupOptions()" aria-label="Close backup options" style="color:#fff;border-radius:50%;background:#36363a;width:35px;height:35px;font-size:22px">×</button>
+    </div>
+    <p id="backupOptionsMessage" style="font-size:12px;color:#c7c7cc;margin:12px 0;line-height:1.5">Choose a backup method. Confirm the file was saved before removing or reinstalling the app.</p>
+    <div style="display:grid;gap:9px">
+      <button type="button" onclick="downloadBackupFile()" style="background:#0a84ff;color:white;font-weight:700;padding:12px;border-radius:14px">Save / Download backup file</button>
+      <button type="button" onclick="copyBackupText()" style="background:#36363b;color:white;font-weight:650;padding:12px;border-radius:14px">Copy backup text</button>
+    </div>
+    <p style="font-size:11px;line-height:1.5;color:#aeaeb2;margin-top:12px">If downloading does not work in an iPhone Home Screen app, copy the text below into Notes or another document and keep it safe. To restore, save it as a .json file and choose Import. Backup contains your private financial records.</p>
+    <textarea id="backupPreviewText" readonly aria-label="Financial backup text" style="margin-top:8px;width:100%;height:100px;box-sizing:border-box;background:#101014;color:#e5e5e5;font-size:11px;border:1px solid #48484a;border-radius:12px;padding:10px"></textarea>
+    <button type="button" onclick="confirmBackupSaved()" style="margin-top:12px;width:100%;background:#25392c;color:#9bffb5;font-weight:650;padding:10px;border-radius:14px">I saved a copy</button>
+  </div>
+</div>
+
+<!-- Transaction Modal -->
+<div id="transactionModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center hidden opacity-0 transition-opacity duration-300">
+  <div class="bg-iosCardDark border border-iosBorderDark w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4 pb-2 border-b border-iosBorderDark">
+      <h3 id="modalHeaderTitle" class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="plus-circle" class="w-5 h-5 text-iosBlue"></i>Add Transaction</h3>
+      <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-black/40 text-iosGray hover:text-white flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+    <form id="txForm" onsubmit="saveTransaction(event)" class="space-y-4">
+      <input type="hidden" id="editingTxId" value="">
+      <div class="grid grid-cols-2 bg-black/50 p-1 rounded-2xl border border-iosBorderDark">
+        <button type="button" id="typeExpenseBtn" onclick="setTxType('expense')" class="py-2 rounded-xl text-xs font-semibold transition bg-iosRed text-white shadow">Expense</button>
+        <button type="button" id="typeIncomeBtn" onclick="setTxType('income')" class="py-2 rounded-xl text-xs font-semibold transition text-iosGray hover:text-white">Income</button>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-iosGray mb-1">Amount (PHP)</label>
+        <div class="relative">
+          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-iosGray text-lg font-bold">₱</span>
+          <input type="number" step="0.01" min="0.01" id="txAmount" required placeholder="0.00" class="w-full bg-black/40 border border-iosBorderDark rounded-2xl pl-8 pr-4 py-3 text-lg font-bold text-white placeholder-iosGray/50 focus:outline-none focus:border-iosBlue transition">
+        </div>
+      </div>
+      <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs">
+        <button type="button" onclick="addAmountPreset(100)" class="px-3 py-1.5 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white">+₱100</button>
+        <button type="button" onclick="addAmountPreset(500)" class="px-3 py-1.5 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white">+₱500</button>
+        <button type="button" onclick="addAmountPreset(1000)" class="px-3 py-1.5 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white">+₱1,000</button>
+        <button type="button" onclick="addAmountPreset(5000)" class="px-3 py-1.5 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white">+₱5,000</button>
+        <button type="button" onclick="addAmountPreset(10000)" class="px-3 py-1.5 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white">+₱10,000</button>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-iosGray mb-1">Category</label>
+        <select id="txCategory" class="w-full bg-black/40 border border-iosBorderDark rounded-2xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-iosBlue transition"></select>
+      </div>
+      <div>
+        <div class="flex justify-between items-center mb-1"><label class="text-xs font-medium text-iosGray">Description / Note</label><span class="text-[10px] text-iosGray/70">(Optional)</span></div>
+        <input type="text" id="txDesc" placeholder="e.g. Supermarket Groceries, Gasoline (Optional)" class="w-full bg-black/40 border border-iosBorderDark rounded-2xl px-3.5 py-2.5 text-xs text-white placeholder-iosGray/50 focus:outline-none focus:border-iosBlue transition">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-iosGray mb-1">Date</label>
+        <input type="date" id="txDate" required class="w-full bg-black/40 border border-iosBorderDark rounded-2xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-iosBlue transition">
+      </div>
+      <button type="submit" id="submitModalBtn" class="w-full bg-iosBlue hover:bg-blue-600 text-white font-semibold py-3 rounded-2xl transition shadow-glow-blue mt-2">Save Transaction</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- Owner-only paid AI. Unlock token lives in memory only, not in localStorage or GitHub. -->
+<div id="askAiDialog" class="ask-ai-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="askAiTitle" onclick="if(event.target===this)closeAskAi()">
+ <section class="ask-ai-panel" tabindex="-1">
+   <div class="flex items-center justify-between gap-2 mb-3">
+     <div><h2 id="askAiTitle" class="text-lg font-extrabold text-white">Private Ask AI</h2><p class="ask-ai-helper">OpenAI-powered · internet required · read-only</p></div>
+     <button type="button" aria-label="Close Ask AI" class="app-settings-close" onclick="closeAskAi()"><i data-lucide="x"></i></button>
+   </div>
+   <div id="askAiUnlockPanel">
+      <p class="ask-ai-helper mb-3">Enter the long Owner Access Token you set on your Cloudflare Worker. Never put your OpenAI API key here. Token is kept in memory only for this session.</p>
+      <label class="ask-ai-label" for="askAiTokenInput">Owner Access Token</label>
+      <input id="askAiTokenInput" type="password" class="ask-ai-field mb-3" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Paste your private owner access token" />
+      <button id="askAiUnlockButton" type="button" class="ask-ai-btn w-full" onclick="unlockAskAi()">Unlock Private AI</button>
+   </div>
+   <div id="askAiChatPanel" class="hidden">
+      <div class="flex justify-between items-center mb-3 gap-2"><span id="askAiUsage" class="ask-ai-helper">Authorized for this session</span><button class="ask-ai-secondary" type="button" onclick="forgetAskAiAccess()">Lock</button></div>
+      <label class="ask-ai-label" for="askAiQuestion">Ask about your finances</label>
+      <textarea id="askAiQuestion" rows="3" maxlength="800" class="ask-ai-field mb-3" placeholder="Example: What spending can I reduce to save more every month?"></textarea>
+      <label class="ask-ai-label" for="askAiPrivacyMode">Financial data to share with OpenAI</label>
+      <select id="askAiPrivacyMode" class="ask-ai-field mb-2">
+         <option value="none">Do not include financial records (default)</option>
+         <option value="summary">Share selected-month summary and category totals</option>
+         <option value="details">Share summary + up to 50 selected-month transaction descriptions</option>
+      </select>
+      <p class="ask-ai-helper mb-3">Data is sent only when you press Ask AI. Your app data remains read-only to AI. Paid AI will not run offline.</p>
+      <button id="askAiSendButton" type="button" class="ask-ai-btn w-full mb-3" onclick="sendAskAiQuestion()">Ask OpenAI</button>
+      <div id="askAiAnswer" class="ask-ai-response" aria-live="polite">Your response will appear here.</div>
+   </div>
+   <p id="askAiStatus" aria-live="polite" class="ask-ai-helper mt-3"></p>
+ </section>
+</div>
+
+<script>
+const RICO_APP_VERSION = '1.8.0';
+let appServiceWorkerRegistration = null;
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope:'./', updateViaCache:'none' })
+      .then(reg => { appServiceWorkerRegistration = reg; console.info('Rico Finances AI offline worker registered.'); })
+      .catch(err => console.warn('Offline installation unavailable:', err));
+  });
+}
+async function checkForAppUpdates() {
+  // Check server metadata FIRST; a failed worker update must not hide whether a new version exists.
+  try {
+    const url = new URL('./version.json?check=' + Date.now(), location.href);
+    const response = await fetch(url.href, { cache:'no-store' });
+    if (!response.ok) throw new Error('Version file unavailable (HTTP ' + response.status + '). Verify version.json is uploaded to the same GitHub Pages folder as index.html.');
+    let details;
+    try { details = await response.json(); }
+    catch (_) { throw new Error('version.json was not valid JSON. Check that GitHub Pages has deployed the full app folder.'); }
+    if (!details.version || !/^\d+\.\d+\.\d+$/.test(details.version)) {
+      throw new Error('Version file does not contain a valid version number.');
+    }
+    if (details.version === RICO_APP_VERSION) {
+      alert('Rico Finances AI v' + RICO_APP_VERSION + ' is current. Your transactions remain on this phone.');
+      return;
+    }
+    const serverParts = details.version.split('.').map(Number);
+    const localParts = RICO_APP_VERSION.split('.').map(Number);
+    const newer = serverParts.findIndex((value, i) => value !== localParts[i]);
+    if (newer >= 0 && serverParts[newer] < localParts[newer]) {
+      alert('Installed v' + RICO_APP_VERSION + ' is newer than the server v' + details.version + '. Check the GitHub Pages deployment before replacing app files.');
+      return;
+    }
+    let workerWarning = '';
+    try {
+      const reg = appServiceWorkerRegistration ||
+        ('serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration('./') : null);
+      if (reg) await reg.update();
+    } catch (workerError) {
+      console.warn('Service worker refresh failed:', workerError);
+      workerWarning = '\n\nOffline cache refresh could not be confirmed. Keep internet on until the new version loads.';
+    }
+    alert('My Finances v' + details.version + ' is available. The app will reload. Your locally stored transactions will not be deliberately changed.' + workerWarning);
+    location.reload();
+  } catch (err) {
+    console.warn('My Finances update check failed:', err);
+    alert('Update check failed: ' + (err && err.message ? err.message : 'Network error') +
+      '\n\nVerify internet access and open the GitHub Pages website in Safari. Do not delete your existing app or its records.');
+  }
+}
+</script>
+
+<script>
+const EXPENSE_CATEGORIES = [
+  { name:'Food & Dining', icon:'utensils', color:'#ff9f0a' },
+  { name:'Shopping & Retail', icon:'shopping-bag', color:'#ff375f' },
+  { name:'Bills & Utilities', icon:'zap', color:'#64d2ff' },
+  { name:'Transportation', icon:'car', color:'#bf5af2' },
+  { name:'Entertainment', icon:'film', color:'#30d158' },
+  { name:'Healthcare', icon:'heart-pulse', color:'#ff453a' },
+  { name:'Other Expense', icon:'more-horizontal', color:'#8e8e93' }
+];
+const INCOME_CATEGORIES = [
+  { name:'Salary / Wages', icon:'briefcase', color:'#30d158' },
+  { name:'Business / Sales', icon:'trending-up', color:'#0a84ff' },
+  { name:'Investments', icon:'pie-chart', color:'#bf5af2' },
+  { name:'Gifts & Allowance', icon:'gift', color:'#ff375f' },
+  { name:'Other Income', icon:'plus-circle', color:'#8e8e93' }
+];
+
+
+// On-device Analyst pop-up. Existing financial data and analyzer remain read-only.
+let aiAnalystReturnFocus = null;
+function openAIAnalyst() {
+  const dialog = document.getElementById('aiAnalystDialog');
+  if (!dialog) return;
+  aiAnalystReturnFocus = document.activeElement;
+  if (typeof window.renderFinanceAnalyst === 'function') window.renderFinanceAnalyst();
+  dialog.classList.remove('hidden');
+  dialog.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('ai-analyst-open');
+  document.getElementById('closeAIAnalystButton').focus();
+}
+function closeAIAnalyst() {
+  const dialog = document.getElementById('aiAnalystDialog');
+  if (!dialog) return;
+  dialog.classList.add('hidden');
+  dialog.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('ai-analyst-open');
+  if (aiAnalystReturnFocus && typeof aiAnalystReturnFocus.focus === 'function') aiAnalystReturnFocus.focus();
+}
+document.addEventListener('keydown', event => {
+  const dialog = document.getElementById('aiAnalystDialog');
+  if (!dialog || dialog.classList.contains('hidden')) return;
+  if (event.key === 'Escape') {event.preventDefault();closeAIAnalyst();return;}
+  if (event.key !== 'Tab') return;
+  const focusable = [...dialog.querySelectorAll('button, input:not([type="hidden"]), select, textarea, a[href], summary')]
+    .filter(el => !el.disabled && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
+  if (!focusable.length) { event.preventDefault(); return; }
+  const first = focusable[0], last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault();last.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault();first.focus(); }
+});
+
+// A single accessible settings dialog; never affects saved financial transactions.
+let personalizationReturnFocus = null;
+function openPersonalization() {
+  const modal = document.getElementById('personalizationDialog');
+  personalizationReturnFocus = document.activeElement;
+  document.getElementById('customAppName').value = personalization.appName;
+  document.getElementById('customDisplayName').value = personalization.displayName;
+  document.getElementById('personalizationMessage').textContent = '';
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('personalization-open');
+  document.getElementById('closePersonalizationButton').focus();
+}
+function closePersonalization() {
+  const modal = document.getElementById('personalizationDialog');
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('personalization-open');
+  if (personalizationReturnFocus && typeof personalizationReturnFocus.focus === 'function') personalizationReturnFocus.focus();
+}
+document.addEventListener('keydown', (e) => {
+  const modal = document.getElementById('personalizationDialog');
+  if (modal && !modal.classList.contains('hidden')) {
+    if (e.key === 'Escape') { closePersonalization(); return; }
+    if (e.key === 'Tab') {
+      const visible = [...modal.querySelectorAll('button, input:not([type="hidden"]), select, textarea, a[href]')].filter(el => !el.disabled && el.offsetParent !== null);
+      if (!visible.length) return;
+      const first = visible[0], last = visible[visible.length-1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  }
+});
+
+// ----- Personalize only the local appearance, NEVER the finance transaction schema -----
+const PERSONALIZATION_KEY = 'rico_finances_ai_preferences_v1';
+const DEFAULT_PERSONALIZATION = Object.freeze({ appName:'Rico Finances AI', displayName:'Boss Rico J.', photo:'' });
+let personalization = loadPersonalization();
+function loadPersonalization() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PERSONALIZATION_KEY) || '{}');
+    // Upgrade the previous *default* app name once. Future manual customization remains unrestricted.
+    const migrationFlag = 'rico_finances_ai_name_upgrade_v1';
+    if (!localStorage.getItem(migrationFlag)) {
+      if (saved.appName === 'My Finances') {
+        saved.appName = 'Rico Finances AI';
+        localStorage.setItem(PERSONALIZATION_KEY, JSON.stringify(saved));
+      }
+      localStorage.setItem(migrationFlag, '1');
+    }
+    return {
+      appName: typeof saved.appName === 'string' && saved.appName.trim() ? saved.appName.trim().slice(0,40) : DEFAULT_PERSONALIZATION.appName,
+      displayName: typeof saved.displayName === 'string' && saved.displayName.trim() ? saved.displayName.trim().slice(0,48) : DEFAULT_PERSONALIZATION.displayName,
+      photo: typeof saved.photo === 'string' && saved.photo.startsWith('data:image/') ? saved.photo : ''
+    };
+  } catch (_) { return {...DEFAULT_PERSONALIZATION}; }
+}
+function applyPersonalization() {
+  document.getElementById('appHeaderTitle').textContent = personalization.appName;
+  document.getElementById('footerAppName').textContent = personalization.appName;
+  // Keep the installed app name stable across devices. Personalization changes in-app labels only.
+  document.title = 'Rico Finances AI - Cash Flow Tracker';
+  const photo = personalization.photo || 'my-finances-icon-192.png';
+  document.getElementById('profileLogo').src = photo;
+  document.getElementById('settingsProfilePreview').src = photo;
+  updateGreeting();
+}
+function initPersonalization() {
+  document.getElementById('customAppName').value = personalization.appName;
+  document.getElementById('customDisplayName').value = personalization.displayName;
+  applyPersonalization();
+}
+function savePersonalization(event) {
+  if (event) event.preventDefault();
+  const appName = document.getElementById('customAppName').value.trim().slice(0,40);
+  const displayName = document.getElementById('customDisplayName').value.trim().slice(0,48);
+  if (!appName || !displayName) { alert('Please enter both an app name and your name.'); return; }
+  const updated = { ...personalization, appName, displayName };
+  try {
+    localStorage.setItem(PERSONALIZATION_KEY, JSON.stringify(updated));
+    personalization = updated;
+    applyPersonalization();
+    document.getElementById('personalizationMessage').textContent = 'Saved! Your app name and greeting have been updated.';
+  } catch (_) { alert('Unable to save your settings. Check device storage permissions.'); }
+}
+function uploadProfilePhoto(event) {
+  const input = event.target;
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/') && !/\.(heic|heif|jpg|jpeg|png|webp)$/i.test(file.name)) { alert('Please choose an image file.'); input.value=''; return; }
+  if (file.size > 12*1024*1024) { alert('Choose a photo smaller than 12 MB.'); input.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width=256; canvas.height=256;
+        const ctx = canvas.getContext('2d');
+        const side = Math.min(img.naturalWidth, img.naturalHeight);
+        const sx = (img.naturalWidth-side)/2, sy = (img.naturalHeight-side)/2;
+        ctx.drawImage(img,sx,sy,side,side,0,0,256,256);
+        const photo = canvas.toDataURL('image/jpeg',0.82);
+        const updated = {...personalization, photo};
+        localStorage.setItem(PERSONALIZATION_KEY,JSON.stringify(updated));
+        personalization=updated; applyPersonalization();
+        document.getElementById('personalizationMessage').textContent = 'Profile photo saved on this device.';
+      } catch (error) { alert('Photo could not be stored. Try a smaller JPEG or PNG image.'); }
+      input.value='';
+    };
+    img.onerror = () => { alert('This photo format could not be decoded. Try JPEG or PNG.'); input.value=''; };
+    img.src = reader.result;
+  };
+  reader.onerror = () => { alert('Could not read that photo.'); input.value=''; };
+  reader.readAsDataURL(file);
+}
+function removeProfilePhoto() {
+  try {
+    const updated={...personalization,photo:''};
+    localStorage.setItem(PERSONALIZATION_KEY,JSON.stringify(updated));
+    personalization=updated; applyPersonalization();
+    document.getElementById('profileImageInput').value='';
+    document.getElementById('personalizationMessage').textContent='Photo reset to the default icon.';
+  } catch (_) { alert('Could not reset the photo.'); }
+}
+
+let transactions = [];
+try {
+  const a = JSON.parse(localStorage.getItem('rico_finances_ai_txs') || '[]');
+  const b = JSON.parse(localStorage.getItem('rico_finances_ai_backup_fallback') || '[]');
+  transactions = a.length ? a : b;
+} catch (e) { transactions = []; }
+
+let currentFilter = 'all', currentTxType = 'expense', chartInstance = null;
+let selectedDate = new Date(); selectedDate.setDate(1);
+
+function todayLocal() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function parseLocalDate(s) { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
+
+document.addEventListener('DOMContentLoaded', () => {
+  initPersonalization(); updateCategoryDropdown(); initNetworkStatus(); initSwipeEvents();
+  renderApp(); initStickmanAnimation(); updateBackupInfo(); lucide.createIcons();
+  document.getElementById('txDate').value = todayLocal();
+  // Keep the greeting and date accurate after midnight and after switching back to the app.
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) updateGreeting(); });
+  window.addEventListener('pageshow', updateGreeting);
+  window.addEventListener('focus', updateGreeting);
+  setInterval(() => { if (!document.hidden) updateGreeting(); }, 60000);
+});
+
+function changeMonth(offset) {
+  selectedDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + offset, 1);
+  renderApp();
+}
+function updateMonthDisplay() {
+  const names = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById('selectedMonthDisplay').textContent = `${names[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+}
+function initSwipeEvents() {
+  const card = document.getElementById('balanceSummaryCard');
+  let sx = 0, sy = 0;
+  card.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  card.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 40 && Math.abs(dy) < 40) changeMonth(dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
+
+// ---------------- Stickman engine (200+ borderless actions) ----------------
+let currentActionIndex = 0, animationFrameId = null;
+const STICKMAN_ACTIONS = [];
+function makeRunner(speed, bounceHeight) {
+  return (ctx, f, w, h) => {
+    const x = (f * speed) % (w + 40) - 20;
+    const b = Math.abs(Math.sin(f * 0.3)) * bounceHeight;
+    const cy = h / 2 + 4 - b;
+    drawHead(ctx, x, cy - 14);
+    drawLine(ctx, x, cy - 8, x, cy + 6);
+    drawLine(ctx, x, cy - 4, x - 8 + Math.sin(f*0.3)*8, cy + 2);
+    drawLine(ctx, x, cy - 4, x + 8 - Math.sin(f*0.3)*8, cy + 2);
+    drawLine(ctx, x, cy + 6, x - 8, cy + 18);
+    drawLine(ctx, x, cy + 6, x + 8, cy + 18);
+  };
+}
+function makeBallPlayer(sportType) {
+  return (ctx, f, w, h) => {
+    const cx = w / 2 + Math.sin(f * 0.05) * 45, cy = h / 2 + 4;
+    drawHead(ctx, cx, cy - 14);
+    drawLine(ctx, cx, cy - 8, cx, cy + 6);
+    drawLine(ctx, cx, cy - 4, cx - 12, cy);
+    drawLine(ctx, cx, cy - 4, cx + 12, cy - 4);
+    drawLine(ctx, cx, cy + 6, cx - 6, cy + 18);
+    drawLine(ctx, cx, cy + 6, cx + 6, cy + 18);
+    ctx.beginPath();
+    const bx = cx + 22 + Math.sin(f * 0.2) * 15, by = cy + 8 + Math.cos(f * 0.2) * 6;
+    ctx.arc(bx, by, sportType === 'saucer' ? 7 : (sportType === 'shuttle' ? 5 : 4), 0, Math.PI * 2);
+    ctx.fillStyle = '#64d2ff'; ctx.fill(); ctx.stroke();
+  };
+}
+const sportsList = ['basketball','soccer','tennis','badminton','volleyball','golf','bowling','billiards','saucer','shuttle','swimming','diving','surfing','parkour','skating','cycling','rowing','boxing','karate','fencing','gymnastics','weightlifting','running','breakdance','backflip'];
+for (let i = 1; i <= 210; i++) {
+  const sport = sportsList[i % sportsList.length];
+  if (i % 4 === 0) STICKMAN_ACTIONS.push(makeRunner(2.2, 5));
+  else if (i % 2 === 0) STICKMAN_ACTIONS.push(makeBallPlayer(sport));
+  else STICKMAN_ACTIONS.push((ctx, f, w, h) => {
+    const rot = (f * 0.07) % (Math.PI * 2);
+    const cx = w / 2 + Math.cos(f * 0.04 + i) * 60, cy = h / 2;
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot);
+    drawHead(ctx, 0, -10);
+    drawLine(ctx, 0, -5, 0, 8); drawLine(ctx, 0, -2, -10, 0); drawLine(ctx, 0, -2, 10, 0);
+    drawLine(ctx, 0, 8, -6, 16); drawLine(ctx, 0, 8, 6, 16);
+    ctx.restore();
+  });
+}
+function initStickmanAnimation() {
+  const canvas = document.getElementById('stickmanCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#64d2ff'; ctx.fillStyle = '#64d2ff';
+    ctx.shadowColor = '#0a84ff'; ctx.shadowBlur = 8; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    STICKMAN_ACTIONS[currentActionIndex](ctx, frame, canvas.width, canvas.height);
+    frame++;
+    if (frame % 220 === 0) currentActionIndex = (currentActionIndex + 1) % STICKMAN_ACTIONS.length;
+    animationFrameId = requestAnimationFrame(animate);
+  }
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  animate();
+}
+function switchStickmanAction() { currentActionIndex = (currentActionIndex + 1) % STICKMAN_ACTIONS.length; }
+function drawHead(ctx, x, y, r = 4) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke(); }
+function drawLine(ctx, x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+
+// ---------------- App engine ----------------
+function initNetworkStatus() {
+  window.addEventListener('online', handleNetworkChange);
+  window.addEventListener('offline', handleNetworkChange);
+  handleNetworkChange();
+}
+function handleNetworkChange() {
+  const on = navigator.onLine;
+  const badge = document.getElementById('syncStatusBadge'), dot = document.getElementById('syncDot');
+  const base = 'px-2.5 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[10px] font-semibold tracking-wide uppercase flex items-center gap-1.5 ';
+  badge.className = base + (on ? 'text-iosGreen' : 'text-iosOrange');
+  dot.className = 'w-2 h-2 rounded-full ' + (on ? 'bg-iosGreen animate-pulse' : 'bg-iosOrange');
+  document.getElementById('syncStatusText').textContent = on ? 'Online' : 'Offline';
+}
+function persistData() {
+  try {
+    const s = JSON.stringify(transactions);
+    localStorage.setItem('rico_finances_ai_txs', s);
+    localStorage.setItem('rico_finances_ai_backup_fallback', s);
+  } catch (e) { alert('Could not save data. Storage may be full or blocked. Please export a backup.'); }
+}
+// Device-local calendar date, refreshed when the app opens or returns to the foreground.
+// A period is included after abbreviated months, e.g. "Monday, Nov. 2, 2026".
+function updateHeaderDate() {
+  const now = new Date();
+  const weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+  const dateLine = document.getElementById('currentDateLine');
+  if (dateLine) dateLine.textContent = `${weekdays[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+}
+function updateGreeting() {
+  const h = new Date().getHours();
+  const g = h >= 5 && h < 12 ? 'Good morning' : (h >= 12 && h < 18 ? 'Good afternoon' : 'Good evening');
+  document.getElementById('userGreeting').textContent = `${g}, ${personalization.displayName}`;
+  updateHeaderDate();
+}
+function formatPHP(amount) {
+  return new Intl.NumberFormat('en-PH', { style:'currency', currency:'PHP', minimumFractionDigits:2 }).format(amount).replace('PHP', '₱');
+}
+function getMonthFilteredTransactions() {
+  const y = selectedDate.getFullYear(), m = selectedDate.getMonth();
+  return transactions.filter(t => { const d = parseLocalDate(t.date); return d.getFullYear() === y && d.getMonth() === m; });
+}
+function renderApp() {
+  updateMonthDisplay(); calculateBalances(); renderTransactions(); renderChartAndBreakdown();
+  if (typeof window.renderFinanceAnalyst === 'function') window.renderFinanceAnalyst();
+  persistData();
+}
+function calculateBalances() {
+  const sum = (arr, type) => arr.filter(t => t.type === type).reduce((a, t) => a + parseFloat(t.amount), 0);
+  const net = sum(transactions, 'income') - sum(transactions, 'expense');
+  document.getElementById('netBalanceDisplay').textContent = formatPHP(net);
+  const mt = getMonthFilteredTransactions();
+  const mi = sum(mt, 'income'), me = sum(mt, 'expense');
+  document.getElementById('totalIncomeDisplay').textContent = formatPHP(mi);
+  document.getElementById('totalExpenseDisplay').textContent = formatPHP(me);
+
+  const st = document.getElementById('cashOnHandStatus');
+  const base = 'px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase ';
+  if (net < 0) { st.textContent = 'Deficit'; st.className = base + 'bg-iosRed/10 text-iosRed border border-iosRed/20'; }
+  else if (net === 0) { st.textContent = 'Neutral'; st.className = base + 'bg-iosOrange/10 text-iosOrange border border-iosOrange/20'; }
+  else { st.textContent = 'Healthy'; st.className = base + 'bg-iosGreen/10 text-iosGreen border border-iosGreen/20'; }
+
+  const bar = document.getElementById('expenseRatioBar'), txt = document.getElementById('expenseRatioText');
+  if (mi > 0) {
+    const r = Math.min(Math.round((me / mi) * 100), 100);
+    bar.style.width = `${r}%`; txt.textContent = `${r}% of income`;
+    bar.className = (r > 85 ? 'bg-iosRed' : 'bg-iosBlue') + ' h-full transition-all duration-500 rounded-full';
+  } else { bar.style.width = '0%'; txt.textContent = '0% of income'; }
+}
+function renderTransactions() {
+  const listEl = document.getElementById('transactionList'), emptyEl = document.getElementById('emptyState');
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = getMonthFilteredTransactions().filter(t => currentFilter === 'all' || t.type === currentFilter);
+  if (term) filtered = filtered.filter(t => t.desc.toLowerCase().includes(term) || t.category.toLowerCase().includes(term));
+  filtered.sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+  document.getElementById('txCount').textContent = `${filtered.length} items`;
+  if (!filtered.length) { listEl.innerHTML = ''; emptyEl.classList.remove('hidden'); return; }
+  emptyEl.classList.add('hidden');
+  listEl.innerHTML = filtered.map(t => {
+    const isExp = t.type === 'expense';
+    const cat = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES].find(c => c.name === t.category) || { icon:'tag', color:'#8e8e93' };
+    return `
+    <div class="bg-iosCardDark border border-iosBorderDark/80 rounded-2xl p-3.5 flex items-center justify-between gap-3 hover:border-iosGray/30 transition">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0" style="background-color:${cat.color}20;color:${cat.color}"><i data-lucide="${cat.icon}" class="w-5 h-5"></i></div>
+        <div class="min-w-0">
+          <p class="text-xs font-bold text-white truncate">${escapeHtml(t.desc)}</p>
+          <div class="flex items-center gap-2 mt-0.5">
+            <span class="text-[10px] text-iosGray">${escapeHtml(t.date)}</span>
+            <span class="text-[10px] px-1.5 rounded bg-black/40 text-iosGray2 border border-iosBorderDark/50">${escapeHtml(t.category)}</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <span class="text-sm font-extrabold ${isExp ? 'text-iosRed' : 'text-iosGreen'}">${isExp ? '-' : '+'}${formatPHP(t.amount)}</span>
+        <button onclick="editTransaction(${t.id})" class="text-iosGray hover:text-iosBlue p-1 transition" title="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+        <button onclick="deleteTransaction(${t.id})" class="text-iosGray hover:text-iosRed p-1 transition" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+function renderChartAndBreakdown() {
+  const expenses = getMonthFilteredTransactions().filter(t => t.type === 'expense');
+  const catMap = {}; let total = 0;
+  expenses.forEach(t => { const a = parseFloat(t.amount); catMap[t.category] = (catMap[t.category] || 0) + a; total += a; });
+  const cats = Object.keys(catMap);
+  document.getElementById('categoryCountBadge').textContent = `${cats.length} Categories`;
+  const legend = document.getElementById('categoryLegend'), cont = document.getElementById('analyticsContainer'), empty = document.getElementById('emptyAnalytics');
+  if (!cats.length || total === 0) { if (chartInstance) { chartInstance.destroy(); chartInstance = null; } cont.classList.add('hidden'); empty.classList.remove('hidden'); return; }
+  cont.classList.remove('hidden'); empty.classList.add('hidden');
+  const data = [], colors = [];
+  legend.innerHTML = cats.map(c => {
+    const amt = catMap[c], pct = Math.round((amt / total) * 100);
+    const col = (EXPENSE_CATEGORIES.find(x => x.name === c) || { color:'#8e8e93' }).color;
+    data.push(amt); colors.push(col);
+    return `<div class="space-y-1">
+      <div class="flex justify-between items-center text-[11px]">
+        <span class="text-iosGray2 flex items-center gap-1.5 truncate"><span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color:${col}"></span>${escapeHtml(c)}</span>
+        <span class="font-semibold text-white">${pct}% (${formatPHP(amt)})</span>
+      </div>
+      <div class="w-full bg-black/40 h-1 rounded-full overflow-hidden"><div class="h-full rounded-full" style="width:${pct}%;background-color:${col}"></div></div>
+    </div>`;
+  }).join('');
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = createOfflineDonutChart(document.getElementById('expenseChart'), data, colors, cats);
+}
+
+
+// Offline canvas doughnut chart: no Chart.js or CDN needed.
+function createOfflineDonutChart(canvas, values, colors, labels) {
+  const total = values.reduce((a,b) => a + Number(b || 0), 0);
+  const parent = canvas.parentElement;
+  let disposed = false;
+  const draw = () => {
+    if (disposed || !canvas.isConnected) return;
+    const size = Math.max(90, Math.round(Math.min(parent.clientWidth || 112, parent.clientHeight || 112)));
+    const scale = Math.min(window.devicePixelRatio || 1, 3);
+    canvas.width = Math.round(size * scale); canvas.height = Math.round(size * scale);
+    canvas.style.width = size + 'px'; canvas.style.height = size + 'px';
+    const ctx = canvas.getContext('2d'); ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.clearRect(0,0,size,size);
+    const cx=size/2,cy=size/2,r=size*0.385,thickness=size*0.19;
+    let angle=-Math.PI/2;
+    values.forEach((value,i)=>{
+      if (!(value > 0) || !(total > 0)) return;
+      const sweep = value / total * Math.PI * 2;
+      ctx.beginPath(); ctx.arc(cx,cy,r,angle,angle+sweep); ctx.strokeStyle=colors[i]||'#8e8e93';
+      ctx.lineWidth=thickness;ctx.lineCap='butt';ctx.stroke(); angle+=sweep;
+    });
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#aeaeb2';
+    ctx.font='600 '+Math.round(size*.105)+'px system-ui';ctx.fillText('EXPENSES',cx,cy-7);
+    ctx.fillStyle='#fff';ctx.font='700 '+Math.round(size*.15)+'px system-ui';
+    ctx.fillText(total >= 1000000 ? '₱'+(total/1000000).toFixed(1)+'M' :
+                 total >= 1000 ? '₱'+(total/1000).toFixed(1)+'K' :
+                 '₱'+Math.round(total),cx,cy+10);
+  };
+  const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(draw) : null;
+  if (observer) observer.observe(parent);
+  else window.addEventListener('resize', draw);
+  canvas.title = labels.map((c,i)=>c+': '+formatPHP(values[i])).join(' | ');
+  draw();
+  return { destroy() { disposed=true; if(observer)observer.disconnect();else window.removeEventListener('resize',draw); } };
+}
+
+function showModal() {
+  const modal = document.getElementById('transactionModal');
+  modal.classList.remove('hidden');
+  setTimeout(() => { modal.classList.remove('opacity-0'); modal.children[0].classList.remove('translate-y-full'); }, 10);
+}
+function openModal() {
+  document.getElementById('txForm').reset();
+  document.getElementById('editingTxId').value = '';
+  document.getElementById('txDate').value = todayLocal();
+  setTxType('expense');
+  document.getElementById('modalHeaderTitle').innerHTML = `<i data-lucide="plus-circle" class="w-5 h-5 text-iosBlue"></i>Add Transaction`;
+  document.getElementById('submitModalBtn').textContent = 'Save Transaction';
+  lucide.createIcons(); showModal();
+}
+function closeModal() {
+  const modal = document.getElementById('transactionModal');
+  modal.children[0].classList.add('translate-y-full'); modal.classList.add('opacity-0');
+  setTimeout(() => { modal.classList.add('hidden'); document.getElementById('txForm').reset(); document.getElementById('editingTxId').value = ''; document.getElementById('txDate').value = todayLocal(); setTxType('expense'); }, 300);
+}
+function setTxType(type) {
+  currentTxType = type;
+  const e = document.getElementById('typeExpenseBtn'), i = document.getElementById('typeIncomeBtn');
+  const on = 'py-2 rounded-xl text-xs font-semibold transition text-white shadow ', off = 'py-2 rounded-xl text-xs font-semibold transition text-iosGray hover:text-white';
+  e.className = type === 'expense' ? on + 'bg-iosRed' : off;
+  i.className = type === 'income' ? on + 'bg-iosGreen' : off;
+  updateCategoryDropdown();
+}
+function updateCategoryDropdown() {
+  const list = currentTxType === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
+  document.getElementById('txCategory').innerHTML = list.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+}
+function addAmountPreset(v) {
+  const el = document.getElementById('txAmount');
+  el.value = ((parseFloat(el.value) || 0) + v).toFixed(2);
+}
+function editTransaction(id) {
+  const tx = transactions.find(t => t.id === id);
+  if (!tx) return;
+  document.getElementById('editingTxId').value = tx.id;
+  setTxType(tx.type);
+  document.getElementById('txAmount').value = tx.amount;
+  document.getElementById('txCategory').value = tx.category;
+  document.getElementById('txDesc').value = tx.desc;
+  document.getElementById('txDate').value = tx.date;
+  document.getElementById('modalHeaderTitle').innerHTML = `<i data-lucide="pencil" class="w-5 h-5 text-iosBlue"></i>Edit Transaction`;
+  document.getElementById('submitModalBtn').textContent = 'Update Transaction';
+  lucide.createIcons(); showModal();
+}
+function saveTransaction(e) {
+  e.preventDefault();
+  const editingId = document.getElementById('editingTxId').value;
+  const amount = parseFloat(document.getElementById('txAmount').value);
+  const category = document.getElementById('txCategory').value;
+  let desc = document.getElementById('txDesc').value.trim();
+  const date = document.getElementById('txDate').value;
+  if (!amount || amount <= 0) return;
+  if (!desc) desc = category;
+  const tx = { id: editingId ? Number(editingId) : Date.now(), type: currentTxType, amount, category, desc, date };
+  if (editingId) { const i = transactions.findIndex(t => t.id == editingId); if (i !== -1) transactions[i] = tx; }
+  else transactions.unshift(tx);
+  renderApp(); closeModal();
+}
+function deleteTransaction(id) {
+  if (confirm('Delete this transaction?')) { transactions = transactions.filter(t => t.id !== id); renderApp(); }
+}
+function setFilter(filter) {
+  currentFilter = filter;
+  ['All','Income','Expense'].forEach(f => {
+    document.getElementById(`filterBtn${f}`).className = 'flex-1 py-1.5 rounded-xl transition text-center ' +
+      (filter.toLowerCase() === f.toLowerCase() ? 'bg-iosBlue text-white shadow-sm' : 'text-iosGray hover:text-white');
+  });
+  renderTransactions();
+}
+
+// ---------------- Backup ----------------
+function updateBackupInfo() {
+  const last = parseInt(localStorage.getItem('rico_finances_ai_last_export') || '0', 10);
+  const days = last ? Math.floor((Date.now() - last) / 86400000) : null;
+  document.getElementById('lastBackupText').textContent = last
+    ? `Stored on this device only. Last backup: ${new Date(last).toLocaleDateString('en-PH')} (${days} day${days === 1 ? '' : 's'} ago).`
+    : 'Stored on this device only. No backup exported yet.';
+  const banner = document.getElementById('backupBanner');
+  if (transactions.length && (!last || days >= 7)) {
+    document.getElementById('backupBannerText').textContent = last ? `Last backup was ${days} days ago.` : 'No backup yet. Export a copy of your data.';
+    banner.classList.remove('hidden');
+  } else banner.classList.add('hidden');
+}
+// Robust offline backup: preserve original JSON-array schema and local storage keys.
+// On iOS, share a real file via the native sheet when possible. Provide visible options otherwise.
+let preparedBackupFile = null;
+let preparedBackupText = '';
+function prepareBackup() {
+  preparedBackupText = JSON.stringify(transactions, null, 2);
+  const filename = `rico_finances_ai_backup_${todayLocal()}.json`;
+  preparedBackupFile = new File([preparedBackupText], filename, {type:'application/json'});
+  document.getElementById('backupPreviewText').value = preparedBackupText;
+}
+function openBackupOptions(message) {
+  document.getElementById('backupOptionsMessage').textContent = message ||
+    'Save a copy of this backup before deleting or reinstalling your app.';
+  const dialog = document.getElementById('backupOptionsDialog');
+  dialog.classList.remove('hidden'); dialog.style.display = 'flex';
+}
+function closeBackupOptions() {
+  const dialog = document.getElementById('backupOptionsDialog');
+  dialog.style.display = 'none'; dialog.classList.add('hidden');
+}
+function confirmBackupSaved() {
+  localStorage.setItem('rico_finances_ai_last_export', String(Date.now()));
+  updateBackupInfo(); closeBackupOptions();
+}
+async function exportData() {
+  try {
+    prepareBackup();
+    // This share() call is made directly from the tap handler to preserve iOS user activation.
+    if (navigator.share && (!navigator.canShare || navigator.canShare({files:[preparedBackupFile]}))) {
+      try {
+        await navigator.share({files:[preparedBackupFile], title:'Rico Finances AI backup'});
+        openBackupOptions('If you saved the backup using the share sheet, tap "I saved a copy". Otherwise use Save / Download or Copy below.');
+        return;
+      } catch (shareError) {
+        console.info('File sharing unavailable or cancelled:', shareError);
+      }
+    }
+    openBackupOptions('Choose Save / Download or Copy. The previous download method may fail silently inside an iPhone Home Screen app.');
+  } catch (err) {
+    alert('Backup preparation failed: ' + (err?.message || 'Unknown error') + '. Your original records remain on this device.');
+  }
+}
+function downloadBackupFile() {
+  if (!preparedBackupFile) prepareBackup();
+  try {
+    const objectUrl = URL.createObjectURL(preparedBackupFile);
+    const link = document.createElement('a');
+    link.href = objectUrl; link.download = preparedBackupFile.name;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    document.getElementById('backupOptionsMessage').textContent =
+      'Download requested. Check Files / Downloads for ' + preparedBackupFile.name + '. If it did not save, use Copy backup text. Only choose "I saved a copy" after verifying.';
+  } catch (err) {
+    document.getElementById('backupOptionsMessage').textContent =
+      'The download could not start. Please use Copy backup text or manually select the text below.';
+  }
+}
+async function copyBackupText() {
+  if (!preparedBackupText) prepareBackup();
+  const area = document.getElementById('backupPreviewText');
+  try {
+    if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard API unavailable');
+    await navigator.clipboard.writeText(preparedBackupText);
+    document.getElementById('backupOptionsMessage').textContent =
+      'Backup copied. Paste it into a secure note or document and save it. Do not paste financial data into public chats.';
+  } catch (_) {
+    area.focus(); area.select(); area.setSelectionRange(0, area.value.length);
+    const copied = document.execCommand && document.execCommand('copy');
+    document.getElementById('backupOptionsMessage').textContent = copied
+      ? 'Backup copied. Paste it into a secure note or document and save it.'
+      : 'Select and copy all the backup text below manually, then save it in a secure note or document.';
+  }
+}
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const fr = new FileReader();
+  fr.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!Array.isArray(imported)) throw new Error('not an array');
+      if (transactions.length && !confirm(`Replace your ${transactions.length} current transactions with ${imported.length} from the file?`)) return;
+      transactions = imported;
+      renderApp(); updateBackupInfo();
+      alert('Data imported successfully!');
+    } catch (err) { alert('Invalid JSON file format.'); }
+    event.target.value = '';
+  };
+  fr.readAsText(file);
+}
+
+// Explicit, one-time copy. Original shared My Finances data is never changed.
+function copyFromSharedFinances() {
+  let source;
+  try {
+    const raw=localStorage.getItem('rico_finances_txs') || localStorage.getItem('rico_finances_backup_fallback');
+    source=raw ? JSON.parse(raw) : null;
+  } catch (_) { alert('Could not read the old app records. Use Export/Import instead.'); return; }
+  if (!Array.isArray(source) || !source.length) {
+    alert('No shared-app records found in this browser. Use Export from My Finances and Import here. Different iPhone Home Screen apps may have separate storage.'); return;
+  }
+  if (!source.every(t => t && typeof t === 'object' && ['income','expense'].includes(t.type) && Number.isFinite(Number(t.amount)) && t.date && t.category)) {
+    alert('The shared-app records are not in the expected format. Please use Export/Import.'); return;
+  }
+  if (!confirm('Copy ' + source.length + ' transaction(s) from My Finances into Rico Finances AI? This will REPLACE the ' + transactions.length + ' record(s) currently in this private app. Original shared-app data will stay unchanged.')) return;
+  const previous=transactions;
+  try {
+    transactions=JSON.parse(JSON.stringify(source));
+    persistData(); renderApp(); updateBackupInfo();
+    alert('Copied ' + source.length + ' record(s). Please Export a backup from this app too.');
+  } catch (_) { transactions=previous; alert('Could not save the copy. Your original shared-app records remain unchanged.'); }
+}
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
+}
+</script>
+</body>
+</html>
