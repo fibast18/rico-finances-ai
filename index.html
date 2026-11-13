@@ -22,7 +22,7 @@
 .pb-safe{padding-bottom:env(safe-area-inset-bottom,20px)}
 .pt-safe{padding-top:env(safe-area-inset-top,20px)}
 
-/* Rico Finances AI v1.8.0 compact 3-line header: app title + actions, greeting, date + connection status. */
+/* Rico Finances AI v1.8.1 compact 3-line header: app title + actions, greeting, date + connection status. */
 #appHeader{position:sticky;top:0;z-index:40;background:rgba(0,0,0,.94);border-bottom:1px solid #2c2c2e;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 #appHeader .app-header-inner{width:100%;max-width:448px;margin:0 auto;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 7px;box-sizing:border-box}
 #appHeader .app-header-primary{display:flex!important;align-items:center;min-width:0}
@@ -41,7 +41,7 @@
 #appHeader .app-ai-btn:focus-visible,#appHeader .app-settings-btn:focus-visible{outline:2px solid #bf8cff;outline-offset:2px}
 #appHeader .app-header-secondary{display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;margin:0;min-height:0}
 #appHeader #syncStatusBadge{width:auto;max-width:max-content;white-space:nowrap;padding:5px 8px;font-size:10px}
-.floating-add-btn{position:fixed!important;left:18px!important;bottom:calc(24px + env(safe-area-inset-bottom,0px))!important;z-index:45!important;display:flex!important;width:66px!important;height:66px!important;border-radius:50%!important;align-items:center!important;justify-content:center!important;background:#0a84ff!important;color:#fff!important;border:1px solid rgba(255,255,255,.24);box-shadow:0 9px 30px rgba(10,132,255,.42)!important;cursor:pointer;touch-action:manipulation;transition:transform .15s ease,box-shadow .15s ease}
+.floating-add-btn{position:fixed!important;left:auto!important;right:18px!important;bottom:calc(24px + env(safe-area-inset-bottom,0px))!important;z-index:45!important;display:flex!important;width:66px!important;height:66px!important;border-radius:50%!important;align-items:center!important;justify-content:center!important;background:#0a84ff!important;color:#fff!important;border:1px solid rgba(255,255,255,.24);box-shadow:0 9px 30px rgba(10,132,255,.42)!important;cursor:pointer;touch-action:manipulation;transition:transform .15s ease,box-shadow .15s ease}
 .floating-add-btn:active{transform:scale(.94)}.floating-add-btn svg{width:32px!important;height:32px!important;stroke-width:2.5}
 body>main{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}
 .personalization-dialog{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));box-sizing:border-box}
@@ -130,7 +130,7 @@ body.ask-ai-open{overflow:hidden}
 </header>
 
 <!-- Persistent action control: bottom-left, 1.5x previous 43px header button. -->
-<button id="addTransactionButton" type="button" aria-label="Add transaction" title="Add transaction" onclick="openModal()" class="floating-add-btn" style="position:fixed;left:18px;bottom:calc(24px + env(safe-area-inset-bottom, 0px));width:66px;height:66px;z-index:45;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#0a84ff;color:#fff;box-shadow:0 10px 30px rgba(10,132,255,.4)">
+<button id="addTransactionButton" type="button" aria-label="Add transaction" title="Add transaction" onclick="openModal()" class="floating-add-btn" style="position:fixed;left:auto;right:18px;bottom:calc(24px + env(safe-area-inset-bottom, 0px));width:66px;height:66px;z-index:45;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#0a84ff;color:#fff;box-shadow:0 10px 30px rgba(10,132,255,.4)">
   <i data-lucide="plus" class="w-8 h-8"></i>
 </button>
 
@@ -244,7 +244,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.0</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.1</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -388,30 +388,31 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 
-<!-- Owner-only paid AI. Unlock token lives in memory only, not in localStorage or GitHub. -->
+<!-- Paid Ask AI using the existing shared Ask Rico Worker. The access code never enters GitHub source. -->
 <div id="askAiDialog" class="ask-ai-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="askAiTitle" onclick="if(event.target===this)closeAskAi()">
  <section class="ask-ai-panel" tabindex="-1">
    <div class="flex items-center justify-between gap-2 mb-3">
-     <div><h2 id="askAiTitle" class="text-lg font-extrabold text-white">Private Ask AI</h2><p class="ask-ai-helper">OpenAI-powered · internet required · read-only</p></div>
+     <div><h2 id="askAiTitle" class="text-lg font-extrabold text-white">Private Ask Rico AI</h2><p class="ask-ai-helper">Your existing paid Cloudflare Worker · online only · read-only</p></div>
      <button type="button" aria-label="Close Ask AI" class="app-settings-close" onclick="closeAskAi()"><i data-lucide="x"></i></button>
    </div>
    <div id="askAiUnlockPanel">
-      <p class="ask-ai-helper mb-3">Enter the long Owner Access Token you set on your Cloudflare Worker. Never put your OpenAI API key here. Token is kept in memory only for this session.</p>
-      <label class="ask-ai-label" for="askAiTokenInput">Owner Access Token</label>
-      <input id="askAiTokenInput" type="password" class="ask-ai-field mb-3" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Paste your private owner access token" />
-      <button id="askAiUnlockButton" type="button" class="ask-ai-btn w-full" onclick="unlockAskAi()">Unlock Private AI</button>
+      <p class="ask-ai-helper mb-3">Enter the private <strong>Ask Rico access code</strong> you already use in your other apps. Do NOT enter an OpenAI API key or an old Owner Access Token. The access code is only sent to your existing Worker for session authorization.</p>
+      <label class="ask-ai-label" for="askAiTokenInput">Ask Rico access code</label>
+      <input id="askAiTokenInput" type="password" class="ask-ai-field mb-3" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Private Ask Rico access code" />
+      <label class="ask-ai-helper mb-3" style="display:flex;align-items:flex-start;gap:8px"><input type="checkbox" id="askAiRememberDevice" style="margin-top:3px"> Remember this device until the Worker session expires (stores only the temporary session token; not the access code)</label>
+      <button id="askAiUnlockButton" type="button" class="ask-ai-btn w-full" onclick="unlockAskAi()">Connect to Existing Ask Rico</button>
    </div>
    <div id="askAiChatPanel" class="hidden">
-      <div class="flex justify-between items-center mb-3 gap-2"><span id="askAiUsage" class="ask-ai-helper">Authorized for this session</span><button class="ask-ai-secondary" type="button" onclick="forgetAskAiAccess()">Lock</button></div>
+      <div class="flex justify-between items-center mb-3 gap-2"><span id="askAiUsage" class="ask-ai-helper">Authorized through your existing Ask Rico Worker</span><button class="ask-ai-secondary" type="button" onclick="forgetAskAiAccess()">Disconnect</button></div>
       <label class="ask-ai-label" for="askAiQuestion">Ask about your finances</label>
       <textarea id="askAiQuestion" rows="3" maxlength="800" class="ask-ai-field mb-3" placeholder="Example: What spending can I reduce to save more every month?"></textarea>
       <label class="ask-ai-label" for="askAiPrivacyMode">Financial data to share with OpenAI</label>
       <select id="askAiPrivacyMode" class="ask-ai-field mb-2">
          <option value="none">Do not include financial records (default)</option>
          <option value="summary">Share selected-month summary and category totals</option>
-         <option value="details">Share summary + up to 50 selected-month transaction descriptions</option>
+         <option value="details">Share summary + up to 50 selected-month transactions</option>
       </select>
-      <p class="ask-ai-helper mb-3">Data is sent only when you press Ask AI. Your app data remains read-only to AI. Paid AI will not run offline.</p>
+      <p class="ask-ai-helper mb-3">Data is shared only when you press Ask OpenAI and only as selected above. The AI cannot edit local records. Access and usage limits are governed by your existing shared Worker.</p>
       <button id="askAiSendButton" type="button" class="ask-ai-btn w-full mb-3" onclick="sendAskAiQuestion()">Ask OpenAI</button>
       <div id="askAiAnswer" class="ask-ai-response" aria-live="polite">Your response will appear here.</div>
    </div>
@@ -420,7 +421,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.0';
+const RICO_APP_VERSION = '1.8.1';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {

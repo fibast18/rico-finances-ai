@@ -1,6 +1,6 @@
-// Rico Finances AI offline-first service worker — v1.8.0
+// Rico Finances AI offline-first service worker — v1.8.1
 // Works on GitHub Pages root sites and subdirectory project sites.
-const CACHE_NAME = 'private-rico-ai-shell-v1.8.0';
+const CACHE_NAME = 'private-rico-ai-shell-v1.8.1';
 const CACHE_PREFIX = 'private-rico-ai-shell-';
 const APP_SHELL = [
   './', './index.html', './styles.css', './icons.js', './analyst.js', './ai-config.js', './ask-ai.js',
