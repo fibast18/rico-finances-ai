@@ -70,7 +70,7 @@ const ctx={
  RICO_CASH_FLOW_BALANCE:()=>700,
  RICO_LINKED_LOANS:{
   balanceDetails:()=>({amount:100,count:1,excludedManual:0}),
-  render(){},refresh(){loanRefreshes++}
+  isDuplicate:()=>false,render(){},refresh(){loanRefreshes++}
  },
  openModal(){modalOpens++}
 };
