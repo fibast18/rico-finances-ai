@@ -82,7 +82,8 @@
   return value;
  }
  function makePayload() {
-  const cash=window.RICO_MANUAL_CASH_FLOW?.()??readJSON(K.cash,readJSON(K.fallback,[]));
+  const cash=window.RICO_MANUAL_CASH_FLOW?.()??
+   (localStorage.getItem(K.cash)!==null?readJSON(K.cash,[]):readJSON(K.fallback,[]));
   const net=window.RICO_NET_WORTH?.manualItems?.()??readJSON(K.net,[]);
   const preferences=readJSON(K.preferences,{});
   const linked={
