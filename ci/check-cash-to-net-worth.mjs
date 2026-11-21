@@ -49,7 +49,7 @@ const ctx={
 ctx.window=ctx;ctx.globalThis=ctx;
 const vm=createContext(ctx);
 new Script(matched[0],{filename:'Cash Flow shared balance getter'}).runInContext(vm);
-new Script(readFileSync('net-worth-v1.8.9.js','utf8'),{filename:'net-worth-v1.8.9.js'}).runInContext(vm);
+new Script(readFileSync('net-worth-v1.8.10.js','utf8'),{filename:'net-worth-v1.8.10.js'}).runInContext(vm);
 for(const handler of events.get('DOMContentLoaded')||[])handler();
 const getTotals=()=>ctx.RICO_NET_WORTH.totals();
 let t=getTotals();
