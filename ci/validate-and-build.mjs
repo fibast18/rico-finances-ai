@@ -123,6 +123,11 @@ const backupTest=spawnSync(process.execPath,['ci/check-full-backup.mjs'],
 assert(backupTest.status===0,
   'Unified full-app backup and import regression failed: '+(backupTest.stderr||backupTest.stdout));
 process.stdout.write(backupTest.stdout||'');
+const analystTest=spawnSync(process.execPath,['ci/check-integrated-analyst.mjs'],
+  {cwd:root,encoding:'utf8'});
+assert(analystTest.status===0,
+  'Integrated financial Analyst regression failed: '+(analystTest.stderr||analystTest.stdout));
+process.stdout.write(analystTest.stdout||'');
 assert(publish.length >= required.length, 'Unexpectedly small publication set');
 const dest = join(root, 'dist');
 rmSync(dest, { recursive: true, force: true });
