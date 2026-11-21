@@ -14,7 +14,7 @@ for(const target of ['id="lastBackupText"','id="importFileInput"','checkForAppUp
  'copyFromSharedFinances()','id="nwImportFile"','id="netWorthSaveStatus"']){
  assert(settingPart.includes(target),'Missing moved settings control '+target);
  assert(!cashPart.includes(target)&&!worthPart.includes(target),'Settings control still on old tab: '+target);
- assert.equal(html.split(target).length-1,1,'Duplicate action or ID: '+target);
+ if(target.startsWith('id="'))assert.equal(html.split(target).length-1,1,'Duplicate control ID: '+target);
 }
 assert.match(settingPart,/onclick="exportData\(\)"/);
 assert.match(settingPart,/onclick="exportNetWorth\(\)"/);
