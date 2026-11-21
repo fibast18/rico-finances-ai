@@ -1,0 +1,29 @@
+/* Rico Finances AI v1.8.12 — mobile-first collapsible linked panels.
+   Collapsing only hides display. Loan Tracker polling and Firebase listeners
+   continue normally, with their original storage and transaction calculations.
+*/
+#linkedBudgetCard,#utilityLinkCard{gap:0}
+.linked-collapse-toggle{
+ display:flex;align-items:center;justify-content:space-between;gap:9px;
+ width:100%;min-height:45px;border:0;background:transparent;color:inherit;
+ padding:1px 0;text-align:left;cursor:pointer;touch-action:manipulation;
+ -webkit-tap-highlight-color:transparent;
+}
+.linked-collapse-toggle:focus-visible{outline:2px solid #63aaf7;outline-offset:3px;border-radius:6px}
+.linked-collapse-label{display:flex;flex:1 1 auto;flex-direction:column;gap:3px;min-width:0}
+.linked-collapse-label strong{font-size:13.5px;font-weight:750;line-height:1.25;color:#eef2fa}
+.linked-collapse-label small{font-size:10.5px;color:#aebbd0;line-height:1.3}
+.linked-collapse-side{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;flex:0 1 auto}
+.linked-collapse-quick{color:#9ed9ff;font-size:11px;font-weight:650;line-height:1.2;
+  text-align:right;max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linked-collapse-chevron{flex:0 0 18px;transition:transform .18s ease;color:#a9b5c5}
+.linked-collapse-toggle[aria-expanded="true"] .linked-collapse-chevron{transform:rotate(180deg)}
+.linked-collapse-body{display:flex;flex-direction:column;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid #343c49}
+.linked-collapse-body[hidden]{display:none!important}
+.linked-collapse-sync-label{display:flex;justify-content:flex-end}
+@media(max-width:360px){
+ .linked-collapse-label strong{font-size:12.5px}
+ .linked-collapse-quick{font-size:10px;max-width:90px}
+ .linked-collapse-side{gap:4px}
+}
+@media(prefers-reduced-motion:reduce){.linked-collapse-chevron{transition:none}}
