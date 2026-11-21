@@ -93,6 +93,11 @@ const cashTest=spawnSync(process.execPath, ['ci/check-cash-to-net-worth.mjs'],
 assert(cashTest.status===0,
   'Cash Flow → Net Worth / compact rows regression failed: '+(cashTest.stderr||cashTest.stdout));
 process.stdout.write(cashTest.stdout||'');
+const keyboardTest=spawnSync(process.execPath, ['ci/check-networth-keyboard.mjs'],
+  {cwd:root,encoding:'utf8'});
+assert(keyboardTest.status===0,
+  'iPhone Asset/Debt editor keyboard regression failed: '+(keyboardTest.stderr||keyboardTest.stdout));
+process.stdout.write(keyboardTest.stdout||'');
 assert(publish.length >= required.length, 'Unexpectedly small publication set');
 const dest = join(root, 'dist');
 rmSync(dest, { recursive: true, force: true });
