@@ -36,6 +36,9 @@ assert(html.includes("RICO_APP_VERSION = '" + version + "'"),
   'index.html app version does not match version.json');
 assert(worker.includes('v' + version),
   'sw.js cache version does not match version.json');
+assert(html.includes('net-worth-v' + version + '.js') &&
+       html.includes('linked-loans-v' + version + '.js'),
+       'Net Worth scripts must have matching versioned filenames');
 const shell = worker.match(/const APP_SHELL\s*=\s*\[([\s\S]*?)\];/);
 assert(shell, 'Service worker APP_SHELL not found');
 for (const match of shell[1].matchAll(/['"]\.\/([^'"]*)['"]/g)) {
@@ -68,6 +71,11 @@ for (const file of publish.filter(name => name.endsWith('.png'))) {
   const sig = readFileSync(join(root, file)).subarray(0, 8).toString('hex');
   assert(sig === '89504e470d0a1a0a', 'Invalid PNG file: ' + file);
 }
+const linkedTest = spawnSync(process.execPath, ['ci/check-linked-net-worth.mjs'],
+  {cwd:root, encoding:'utf8'});
+assert(linkedTest.status === 0,
+  'Linked Net Worth regression failed: ' + (linkedTest.stderr || linkedTest.stdout));
+process.stdout.write(linkedTest.stdout || '');
 assert(publish.length >= required.length, 'Unexpectedly small publication set');
 const dest = join(root, 'dist');
 rmSync(dest, { recursive: true, force: true });
