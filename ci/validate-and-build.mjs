@@ -43,7 +43,8 @@ assert(html.includes('net-worth-v' + version + '.js') &&
        html.includes('linked-utilities.css') &&
        html.includes('linked-panels.css') &&
        html.includes('linked-panels-v' + version + '.js') &&
-       html.includes('ask-ai-v' + version + '.js'),
+       html.includes('ask-ai-v' + version + '.js') &&
+       html.includes('backup-manager-v' + version + '.js'),
        'Net Worth, linked budget and Ask AI scripts must match release');
 const shell = worker.match(/const APP_SHELL\s*=\s*\[([\s\S]*?)\];/);
 assert(shell, 'Service worker APP_SHELL not found');
@@ -117,6 +118,11 @@ const thirdTabTest=spawnSync(process.execPath,['ci/check-third-tab.mjs'],
 assert(thirdTabTest.status===0,
   'Data Settings/Net Worth disclosure regression failed: '+(thirdTabTest.stderr||thirdTabTest.stdout));
 process.stdout.write(thirdTabTest.stdout||'');
+const backupTest=spawnSync(process.execPath,['ci/check-full-backup.mjs'],
+  {cwd:root,encoding:'utf8'});
+assert(backupTest.status===0,
+  'Unified full-app backup and import regression failed: '+(backupTest.stderr||backupTest.stdout));
+process.stdout.write(backupTest.stdout||'');
 assert(publish.length >= required.length, 'Unexpectedly small publication set');
 const dest = join(root, 'dist');
 rmSync(dest, { recursive: true, force: true });
