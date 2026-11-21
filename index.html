@@ -20,11 +20,11 @@
 <link rel="stylesheet" href="linked-panels.css">
 <script src="icons.js"></script>
 <script src="analyst.js" defer></script>
-<script src="net-worth-v1.8.14.js" defer></script>
-<script src="linked-loans-v1.8.14.js" defer></script>
-<script src="linked-budget-v1.8.14.js" defer></script>
-<script src="linked-utilities-v1.8.14.js" defer></script>
-<script src="linked-panels-v1.8.14.js" defer></script>
+<script src="net-worth-v1.8.15.js" defer></script>
+<script src="linked-loans-v1.8.15.js" defer></script>
+<script src="linked-budget-v1.8.15.js" defer></script>
+<script src="linked-utilities-v1.8.15.js" defer></script>
+<script src="linked-panels-v1.8.15.js" defer></script>
 <style>
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:rgba(0,0,0,.1)}
@@ -64,7 +64,7 @@ body>main{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important
 body.personalization-open,body.ai-analyst-open{overflow:hidden;touch-action:pan-y}
 .ai-analyst-dialog{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));box-sizing:border-box;background:rgba(0,0,0,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .ai-analyst-dialog.hidden{display:none!important}
-.ai-analyst-modal-panel{width:100%;max-width:430px;max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:24px;box-shadow:0 25px 70px rgba(0,0,0,.7)}
+.ai-analyst-modal-panel{width:100%;max-width:760px;max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:22px;box-shadow:0 25px 70px rgba(0,0,0,.7)}
 #aiAnalystSection{margin:0}
 #aiAnalystSection .ai-analyst-heading{align-items:center;gap:7px}
 #aiAnalystSection .ai-analyst-heading>div{min-width:0;flex:1}
@@ -72,6 +72,17 @@ body.personalization-open,body.ai-analyst-open{overflow:hidden;touch-action:pan-
 .ai-analyst-close{display:flex;align-items:center;justify-content:center;flex:0 0 35px;width:35px;height:35px;border-radius:50%;background:#35303d;color:#fff;border:1px solid #62506d;cursor:pointer;touch-action:manipulation}
 .ai-analyst-close svg{width:18px;height:18px}
 .ai-analyst-close:focus-visible{outline:2px solid #bf8cff;outline-offset:2px}
+#aiAnalystSection .ai-analyst-heading{position:sticky;top:0;z-index:3;background:#22202c;border-radius:12px;padding:5px 0}
+#aiAnalystSection .ai-breakdown{margin-top:6px;display:grid;gap:5px}
+#aiAnalystSection .ai-mini-head{margin:14px 0 5px;color:#d7bbff;font-weight:750;font-size:12px}
+#aiAnalystSection .ai-source-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 3px;border-bottom:1px solid rgba(255,255,255,.1);font-size:11px;line-height:1.4;color:#d0c8d8}
+#aiAnalystSection .ai-source-row span{min-width:0;overflow-wrap:anywhere}
+#aiAnalystSection .ai-source-row strong{white-space:nowrap;text-align:right;font-size:11px;color:#f0e4ff;font-variant-numeric:tabular-nums}
+#aiAnalystSection .ai-analyst-smallnote{font-size:10px;color:#a9a2b6;line-height:1.5;margin:6px 1px}
+#aiAnalystSection .ai-analyst-expanded{max-width:100%;overflow-wrap:anywhere}
+@media(min-width:650px){#aiAnalystSection .ai-metric-grid{grid-template-columns:repeat(4,minmax(0,1fr))}#aiAnalystSection .ai-question-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#aiAnalystSection .ai-analyst-findings{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.ai-analyst-dialog{padding:0!important}.ai-analyst-modal-panel{width:100vw;max-width:none;height:100dvh;max-height:100dvh;border-radius:0}.ai-analyst-panel{border-radius:0!important;min-height:100%;box-sizing:border-box;padding:calc(12px + env(safe-area-inset-top,0px)) 14px calc(20px + env(safe-area-inset-bottom,0px))!important}#aiAnalystSection .ai-analyst-heading{top:calc(-12px - env(safe-area-inset-top,0px));padding:9px 0}}
+
 @media(max-width:385px){#appHeader #profileLogo{width:62px!important;height:62px!important;min-width:62px!important;max-width:62px!important;max-height:62px!important;min-height:62px!important;flex-basis:62px}#appHeader .app-header-person{gap:8px}#appHeader .app-header-inner{padding-left:10px;padding-right:10px}#appHeader #appHeaderTitle{font-size:16px}#appHeader #userGreeting{font-size:15px}#appHeader #currentDateLine{font-size:11px}#appHeader .app-ai-btn,#appHeader .app-settings-btn{width:37px;height:37px;flex-basis:37px}#appHeader .app-header-actions{gap:4px}#appHeader #syncStatusBadge{font-size:9px;padding:4px 6px}#appHeader #syncDot{width:6px;height:6px}}
 @media(max-width:340px){#appHeader #currentDateLine{font-size:10px;letter-spacing:-.3px}#appHeader #profileLogo{width:54px!important;height:54px!important;min-width:54px!important;max-width:54px!important;max-height:54px!important;min-height:54px!important;flex-basis:54px}#appHeader .app-header-person{gap:7px}#appHeader .app-header-actions{gap:3px}#appHeader .app-ai-btn,#appHeader .app-settings-btn{width:33px;height:33px;flex-basis:33px;border-radius:11px}#appHeader #appHeaderTitle{font-size:14px}#appHeader #userGreeting{font-size:13px}}
 
@@ -144,8 +155,8 @@ body.ask-ai-open{overflow:hidden}
 @media(max-height:550px){.rico-chat-compose-area .rico-chat-check small{display:none}.rico-chat-messages{min-height:40px}}
 </style>
 <script src="ai-config.js" defer></script>
-<script src="ask-ai-v1.8.14.js" defer></script>
-<script src="backup-manager-v1.8.14.js" defer></script>
+<script src="ask-ai-v1.8.15.js" defer></script>
+<script src="backup-manager-v1.8.15.js" defer></script>
 </head>
 <body class="bg-black text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-iosBlue selection:text-white pb-safe">
 
@@ -455,7 +466,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.14</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.15</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -469,31 +480,43 @@ body.ask-ai-open{overflow:hidden}
     <div class="ai-analyst-heading">
       <div>
         <h2 id="aiAnalystHeading" class="ai-analyst-title"><span class="ai-analyst-star" aria-hidden="true">✦</span> AI Analyst</h2>
-        <p class="ai-analyst-subtitle">Your monthly cash flow, explained</p>
+        <p class="ai-analyst-subtitle">Cash Flow · Net Worth · Loans · Budget · Utilities</p>
       </div>
       <span class="ai-analyst-offline">ON-DEVICE</span>
       <button id="closeAIAnalystButton" type="button" class="ai-analyst-close" onclick="closeAIAnalyst()" aria-label="Close AI Analyst" title="Close AI Analyst"><i data-lucide="x"></i></button>
     </div>
     <p id="aiAnalystPeriod" class="ai-analyst-period">Analyzing selected month…</p>
+    <h3 class="ai-analyst-minititle">Monthly Cash Flow</h3>
     <div id="aiAnalystOverview" class="ai-metric-grid" aria-live="polite"></div>
+    <h3 class="ai-analyst-minititle">Overall Financial Picture</h3>
+    <div id="aiAnalystIntegrated" class="ai-metric-grid" aria-live="polite"></div>
+    <h3 class="ai-analyst-minititle">Linked Household Data</h3>
+    <div id="aiAnalystConnected" class="ai-metric-grid" aria-live="polite"></div>
     <h3 class="ai-analyst-minititle">Key findings</h3>
     <div id="aiAnalystHighlights" class="ai-analyst-findings" aria-live="polite"></div>
     <details id="aiAnalystMore" class="ai-analyst-details">
-      <summary>Explore trends &amp; ask the Analyst <span aria-hidden="true">⌄</span></summary>
+      <summary>Explore details, trends &amp; questions <span aria-hidden="true">⌄</span></summary>
       <div class="ai-analyst-expanded">
         <h3 class="ai-analyst-minititle">Last 6 months · recorded expenses</h3>
         <div id="aiAnalystTrend" class="ai-analyst-history"></div>
-        <h3 class="ai-analyst-minititle">Ask about this month</h3>
+        <h3 class="ai-analyst-minititle">Detailed breakdown</h3>
+        <div id="aiAnalystBreakdown" class="ai-breakdown"></div>
+        <h3 class="ai-analyst-minititle">Ask about your finances</h3>
         <div class="ai-question-grid" role="group" aria-label="Ask financial analyst">
           <button type="button" onclick="askFinanceAnalyst('summary')">Cash flow</button>
+          <button type="button" onclick="askFinanceAnalyst('networth')">Net Worth</button>
+          <button type="button" onclick="askFinanceAnalyst('loans')">Loans</button>
+          <button type="button" onclick="askFinanceAnalyst('budget')">Family budget</button>
+          <button type="button" onclick="askFinanceAnalyst('utilities')">Paid utilities</button>
           <button type="button" onclick="askFinanceAnalyst('spending')">Top spending</button>
           <button type="button" onclick="askFinanceAnalyst('compare')">Last month</button>
+          <button type="button" onclick="askFinanceAnalyst('trend')">6-month trend</button>
           <button type="button" onclick="askFinanceAnalyst('savings')">Saving ideas</button>
         </div>
         <p id="aiAnalystAnswer" class="ai-analyst-answer" role="status">Choose a question to see an explanation based on your records.</p>
       </div>
     </details>
-    <p class="ai-analyst-disclaimer">Free, offline, built-in rule-based analysis—not a cloud AI model. It only reads this device's logged transactions; missing entries affect accuracy. Suggestions are informational, not professional financial advice.</p>
+    <p class="ai-analyst-disclaimer">Built-in, on-device, read-only analysis—not a cloud AI model. Uses saved records and authorized linked snapshots; planned budget figures are separate from actual spending. Estimates and missing entries affect accuracy.</p>
     </section>
 
   </div>
@@ -654,7 +677,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.14';
+const RICO_APP_VERSION = '1.8.15';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
