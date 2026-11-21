@@ -57,7 +57,7 @@ const ctx={
 ctx.window=ctx;ctx.globalThis=ctx;
 ctx.RICO_NET_WORTH={manualItems:()=>[],render:()=>{renders++;ctx.RICO_LINKED_LOANS?.render()}};
 const vm=createContext(ctx);
-for(const file of ['linked-loans-v1.8.11.js','linked-budget-v1.8.11.js'])
+for(const file of ['linked-loans-v1.8.12.js','linked-budget-v1.8.12.js'])
  new Script(readFileSync(file,'utf8'),{filename:file}).runInContext(vm);
 assert.equal(ctx.RICO_LINKED_LOANS.autoSyncMs,30000);
 assert.equal(timers.length,0,'No timer before DOM ready');
