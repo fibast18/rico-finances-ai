@@ -47,14 +47,14 @@ const context={
   removeItem:k=>stored.delete(k)
  },
  navigator:{onLine:false},console,Intl,Date,Number,String,Array,Math,Map,Set,
- URL,File:class{},setTimeout,clearTimeout,confirm:()=>true,alert:()=>{},
+ URL,File:class{},setTimeout,clearTimeout,setInterval:()=>1,clearInterval:()=>{},confirm:()=>true,alert:()=>{},
  crypto:{randomUUID:()=> 'synthetic-id'},
  addEventListener(){},scrollTo(){},location:{origin:'https://fibast18.github.io'},
 };
 context.window=context;
 context.globalThis=context;
 const vm=createContext(context);
-for(const file of ['net-worth-v1.8.7.js','linked-loans-v1.8.7.js']){
+for(const file of ['net-worth-v1.8.8.js','linked-loans-v1.8.8.js']){
  new Script(readFileSync(file,'utf8'),{filename:file}).runInContext(vm);
 }
 assert.equal(context.RICO_NET_WORTH.version,context.RICO_LINKED_LOANS.version,'Related modules must match');
