@@ -17,3 +17,7 @@
 .nw-link-total{border-top:1px solid #383b47;padding-top:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:#bfc6d3}
 .nw-link-total strong{color:#ffada8;font-size:14px;font-variant-numeric:tabular-nums}
 @media(max-width:365px){.nw-link-item{grid-template-columns:22px minmax(0,1fr);gap:7px}.nw-link-item strong{grid-column:2;text-align:left}}
+
+.nw-auto-indicator{font-size:11px;color:#7bf0ac;background:#17352a;border:1px solid #286b4d;border-radius:999px;padding:8px 10px;flex:1;text-align:center;white-space:nowrap}
+#loanLinkConnectedArea{align-items:center}
+#loanLinkConnectedArea .nw-btn{min-width:112px}
