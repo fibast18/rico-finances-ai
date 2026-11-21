@@ -39,6 +39,8 @@ assert(worker.includes('v' + version),
 assert(html.includes('net-worth-v' + version + '.js') &&
        html.includes('linked-loans-v' + version + '.js') &&
        html.includes('linked-budget-v' + version + '.js') &&
+       html.includes('linked-utilities-v' + version + '.js') &&
+       html.includes('linked-utilities.css') &&
        html.includes('ask-ai-v' + version + '.js'),
        'Net Worth, linked budget and Ask AI scripts must match release');
 const shell = worker.match(/const APP_SHELL\s*=\s*\[([\s\S]*?)\];/);
@@ -98,6 +100,11 @@ const keyboardTest=spawnSync(process.execPath, ['ci/check-networth-keyboard.mjs'
 assert(keyboardTest.status===0,
   'iPhone Asset/Debt editor keyboard regression failed: '+(keyboardTest.stderr||keyboardTest.stdout));
 process.stdout.write(keyboardTest.stdout||'');
+const utilityTest=spawnSync(process.execPath,['ci/check-linked-utilities.mjs'],
+  {cwd:root,encoding:'utf8'});
+assert(utilityTest.status===0,
+  'Linked paid Home Utilities regression failed: '+(utilityTest.stderr||utilityTest.stdout));
+process.stdout.write(utilityTest.stdout||'');
 assert(publish.length >= required.length, 'Unexpectedly small publication set');
 const dest = join(root, 'dist');
 rmSync(dest, { recursive: true, force: true });
