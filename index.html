@@ -14,9 +14,11 @@
 <meta name="apple-mobile-web-app-title" content="Rico Finances AI" id="iosAppTitle">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="net-worth.css">
+<link rel="stylesheet" href="linked-loans.css">
 <script src="icons.js"></script>
 <script src="analyst.js" defer></script>
 <script src="net-worth.js" defer></script>
+<script src="linked-loans.js" defer></script>
 <style>
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:rgba(0,0,0,.1)}
@@ -308,6 +310,25 @@ body.ask-ai-open{overflow:hidden}
     <div class="nw-card-title">Assets <span id="netWorthAssetCount">0 items</span></div>
     <div id="netWorthAssetList"></div>
   </section>
+  <section class="nw-card" id="loanLinkCard" aria-labelledby="loanLinkTitle">
+    <div class="nw-card-title" id="loanLinkTitle">Linked Loans <span>READ ONLY</span></div>
+    <p class="nw-hint">Import current loan balances directly from your Pono Family Loan Tracker. Nothing is changed in the Loan Tracker.</p>
+    <p id="loanLinkStatus" role="status" aria-live="polite" class="nw-link-status">Not connected.</p>
+    <div id="loanLinkConnectArea" class="nw-link-connect">
+      <label for="loanLinkCode">Private connection code</label>
+      <input id="loanLinkCode" type="password" autocomplete="off" placeholder="Paste code from Loan Tracker" spellcheck="false">
+      <button class="nw-btn nw-btn-primary" type="button" id="loanLinkConnect">Connect &amp; sync</button>
+      <a class="nw-link-open" href="https://pono-family-loan-tracker.rjpono.workers.dev/" target="_blank" rel="noopener noreferrer">Open Loan Tracker to get a code</a>
+    </div>
+    <div id="loanLinkConnectedArea" hidden class="nw-actions">
+      <button type="button" id="loanLinkRefresh" class="nw-btn nw-btn-primary">Refresh loans</button>
+      <button type="button" id="loanLinkDisconnect" class="nw-btn">Disconnect</button>
+    </div>
+    <div id="loanLinkItems" aria-label="Choose loans included in net worth"></div>
+    <div class="nw-link-total"><span>Included linked loans</span><strong id="loanLinkIncludedTotal">₱0.00</strong></div>
+    <p id="loanLinkDuplicates" class="nw-hint">Only checked loans count toward your debts. Matching manual entries won't be counted twice.</p>
+    <p class="nw-hint">Balances follow Loan Tracker's scheduled payroll deductions and may differ from lender statements. Cached values remain visible offline.</p>
+  </section>
   <section class="nw-card">
     <div class="nw-card-title">Debts <span id="netWorthLiabilityCount">0 items</span></div>
     <div id="netWorthLiabilityList"></div>
@@ -334,7 +355,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.4</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.5</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -533,7 +554,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.4';
+const RICO_APP_VERSION = '1.8.5';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
