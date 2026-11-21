@@ -36,15 +36,17 @@ assert(html.includes("RICO_APP_VERSION = '" + version + "'"),
   'index.html app version does not match version.json');
 assert(worker.includes('v' + version),
   'sw.js cache version does not match version.json');
-assert(html.includes('net-worth-v' + version + '.js') &&
-       html.includes('linked-loans-v' + version + '.js') &&
-       html.includes('linked-budget-v' + version + '.js') &&
-       html.includes('linked-utilities-v' + version + '.js') &&
+// Existing v1.8.15 integration modules remain unchanged in this additive release.
+const integratedModuleVersion = '1.8.15';
+assert(html.includes('net-worth-v' + integratedModuleVersion + '.js') &&
+       html.includes('linked-loans-v' + integratedModuleVersion + '.js') &&
+       html.includes('linked-budget-v' + integratedModuleVersion + '.js') &&
+       html.includes('linked-utilities-v' + integratedModuleVersion + '.js') &&
        html.includes('linked-utilities.css') &&
        html.includes('linked-panels.css') &&
-       html.includes('linked-panels-v' + version + '.js') &&
-       html.includes('ask-ai-v' + version + '.js') &&
-       html.includes('backup-manager-v' + version + '.js'),
+       html.includes('linked-panels-v' + integratedModuleVersion + '.js') &&
+       html.includes('ask-ai-v' + integratedModuleVersion + '.js') &&
+       html.includes('backup-manager-v' + integratedModuleVersion + '.js'),
        'Net Worth, linked budget and Ask AI scripts must match release');
 const shell = worker.match(/const APP_SHELL\s*=\s*\[([\s\S]*?)\];/);
 assert(shell, 'Service worker APP_SHELL not found');

@@ -250,6 +250,7 @@
       fab.title=page==='cash'?'Add transaction':'Add asset or debt';
     }
     if(page==='networth'){render();window.RICO_LINKED_LOANS?.refresh();}
+    if(page==='cash')window.renderFinancialHealth?.();
     window.scrollTo?.({top:0,behavior:'instant'});
   }
   async function exportNetWorth() {
