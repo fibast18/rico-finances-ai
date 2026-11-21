@@ -1,10 +1,10 @@
-// v1.8.14 — complete device backup, safe import and rollback.
+// v1.8.15 — complete device backup, safe import and rollback.
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createContext,Script} from 'node:vm';
 
 const html=readFileSync('index.html','utf8');
-const backup=readFileSync('backup-manager-v1.8.14.js','utf8');
+const backup=readFileSync('backup-manager-v1.8.15.js','utf8');
 const p=html.indexOf('id="dataSettingsPanel"');
 const e=html.indexOf('</main>',p);
 const settings=html.slice(p,e);
@@ -61,9 +61,9 @@ const context={
  confirm(_text){confirms++;return allow;}
 };
 context.window=context;context.globalThis=context;
-new Script(backup,{filename:'backup-manager-v1.8.14.js'}).runInContext(createContext(context));
+new Script(backup,{filename:'backup-manager-v1.8.15.js'}).runInContext(createContext(context));
 const manager=context.RICO_FULL_BACKUP;
-assert.equal(manager.version,'1.8.14');
+assert.equal(manager.version,'1.8.15');
 const payload=manager.makePayload();
 assert.equal(payload.kind,'full-device-backup');
 assert.equal(payload.schema,1);
