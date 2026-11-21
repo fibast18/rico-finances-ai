@@ -1,4 +1,4 @@
-/* Rico Finances AI v1.8.4 — private on-device Net Worth ledger.
+/* Rico Finances AI v1.8.5 — private on-device Net Worth ledger.
  * Separate from transaction records. All values are entered manually in PHP.
  * Existing transaction backup file format and financial storage keys remain unchanged.
  */
@@ -54,8 +54,10 @@
   }
   function total(type) { return Math.round(items.filter(x=>x.type===type).reduce((n,x)=>n+x.amount,0)*100)/100; }
   function totals() {
-    const assets=total('asset'), liabilities=total('liability');
-    return {assets, liabilities, netWorth:Math.round((assets-liabilities)*100)/100, count:items.length};
+    const assets=total('asset'), manualDebt=total('liability');
+    const link=window.RICO_LINKED_LOANS?.balanceDetails(items)||{amount:0,count:0,excludedManual:0};
+    const liabilities=Math.round((manualDebt+link.amount-link.excludedManual)*100)/100;
+    return {assets, liabilities, netWorth:Math.round((assets-liabilities)*100)/100, count:items.length,linkedDebt:link.amount,linkedCount:link.count,skippedDuplicates:link.excludedManual};
   }
   function renderList(type) {
     const list=$(type==='asset'?'netWorthAssetList':'netWorthLiabilityList');
@@ -68,7 +70,7 @@
       const card=document.createElement('div');card.className='nw-item';
       const detail=document.createElement('div');detail.className='nw-item-info';
       const heading=document.createElement('strong');heading.textContent=item.name;
-      const meta=document.createElement('span');meta.textContent=item.category;
+      const meta=document.createElement('span');meta.textContent=item.category+(window.RICO_LINKED_LOANS?.isDuplicate(item)?' · Linked balance used instead':'');
       detail.append(heading,meta);
       const value=document.createElement('span');value.className='nw-item-amount';value.textContent=amountPHP(item.amount);
       const actions=document.createElement('div');actions.className='nw-item-actions';
@@ -85,7 +87,7 @@
     $('netWorthLiabilities').textContent=amountPHP(t.liabilities);
     $('netWorthAssetCount').textContent=items.filter(x=>x.type==='asset').length+' items';
     $('netWorthLiabilityCount').textContent=items.filter(x=>x.type==='liability').length+' items';
-    renderList('asset');renderList('liability');
+    renderList('asset');renderList('liability');window.RICO_LINKED_LOANS?.render();
   }
   function setKind(next) {
     kind=next;
@@ -143,7 +145,7 @@
     const fab=$('addTransactionButton');
     fab.setAttribute('aria-label',page==='cash'?'Add transaction':'Add asset or debt');
     fab.title=page==='cash'?'Add transaction':'Add asset or debt';
-    if(page==='networth')render();
+    if(page==='networth'){render();window.RICO_LINKED_LOANS?.refresh();}
     window.scrollTo?.({top:0,behavior:'instant'});
   }
   async function exportNetWorth() {
@@ -181,9 +183,9 @@
     const t=totals();
     const byType=type=>items.filter(x=>x.type===type).sort((a,b)=>b.amount-a.amount).slice(0,3)
       .map(x=>x.name.slice(0,22)+':'+Math.round(x.amount)).join('; ');
-    return `NET WORTH manually entered assets=${t.assets}, debts=${t.liabilities}, net=${t.netWorth}; ${t.count} tracked items. Top assets [${byType('asset')}]; debts [${byType('liability')}]. This is a current snapshot, NOT the cash-flow income-minus-expenses balance.`;
+    return `NET WORTH assets=${t.assets}, total debts=${t.liabilities}, net=${t.netWorth}; manually entered items=${t.count}; selected read-only Loan Tracker debt=${t.linkedDebt} across ${t.linkedCount} loans; excluded duplicate manual debt=${t.skippedDuplicates}. Top assets [${byType('asset')}]; manual debts [${byType('liability')}]. Linked balances are estimated after scheduled deductions and may be stale offline. This is NOT the cash-flow income-minus-expenses balance.`;
   }
-  window.RICO_NET_WORTH={init,totals,aiSummary,render};
+  window.RICO_NET_WORTH={init,totals,aiSummary,render,manualItems:()=>items.map(x=>({...x}))};
   window.switchMainTab=switchTab;
   window.openNetWorthForm=openForm;
   window.closeNetWorthForm=closeForm;
