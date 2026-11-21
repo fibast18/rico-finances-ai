@@ -50,8 +50,8 @@ const context={
 context.window=context;
 context.RICO_MANUAL_CASH_FLOW=()=>manual.slice();
 context.RICO_RENDER_CASH_FLOW=()=>{rendered++;};
-new Script(readFileSync('linked-utilities-v1.8.11.js','utf8'),
- {filename:'linked-utilities-v1.8.11.js'}).runInContext(createContext(context));
+new Script(readFileSync('linked-utilities-v1.8.12.js','utf8'),
+ {filename:'linked-utilities-v1.8.12.js'}).runInContext(createContext(context));
 for(const h of events.get('DOMContentLoaded')||[])h();
 const link=context.RICO_UTILITY_LINK;
 assert.equal(link.linkedRows.length,3);
@@ -76,7 +76,7 @@ link.acceptSnapshot(revised);
 assert.equal(link.linkedRows.length,2);
 assert.equal(saved.get('rico_finances_ai_txs'),JSON.stringify(manual),'Firebase sync never writes Cash Flow localStorage');
 assert.equal(JSON.parse(saved.get('rico_finances_utility_paid_snapshot_v1')).entries.length,2);
-const code=readFileSync('linked-utilities-v1.8.11.js','utf8');
+const code=readFileSync('linked-utilities-v1.8.12.js','utf8');
 assert(code.includes("db.onSnapshot(ref"),'Firebase real-time event subscription missing');
 assert(!code.includes('db.setDoc(')&&!code.includes('db.updateDoc(')&&!code.includes('db.deleteDoc('),
  'Finances must not write any utility records');
