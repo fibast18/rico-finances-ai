@@ -1,9 +1,15 @@
 /* Rico Finances AI v1.8.4 — minimal iPhone Net Worth tab */
-#cashFlowPanel[hidden],#netWorthPanel[hidden],#nwDialog[hidden]{display:none!important}
+#cashFlowPanel[hidden],#netWorthPanel[hidden],#dataSettingsPanel[hidden],#nwDialog[hidden],#addTransactionButton[hidden]{display:none!important}
 #cashFlowPanel{display:flex;flex-direction:column;gap:20px}
 #netWorthPanel{display:flex;flex-direction:column;gap:17px}
+#dataSettingsPanel{display:flex;flex-direction:column;gap:18px}
 #mainTabNav{position:fixed;z-index:45;inset:auto 0 0;background:rgba(19,20,23,.97);border-top:1px solid #3a3a3f;padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center;gap:12px;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
-#mainTabNav button{flex:1 1 0;max-width:212px;min-height:48px;background:transparent;color:#a5a5af;border-radius:13px;border:0;display:flex;align-items:center;justify-content:center;gap:9px;font-size:13px;font-weight:700;touch-action:manipulation;cursor:pointer}
+#mainTabNav button{flex:1 1 0;max-width:165px;min-width:0;min-height:49px;background:transparent;color:#a5a5af;border-radius:13px;border:0;display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:700;touch-action:manipulation;cursor:pointer}
+#mainTabNav button span{display:flex;flex-direction:column;align-items:center;line-height:1.12;min-width:0}
+#mainTabNav button span small{font-size:10px;font-weight:600;line-height:1.15}
+@media(max-width:380px){#mainTabNav{gap:3px!important;padding-left:8px!important;padding-right:8px!important}#mainTabNav button{font-size:10.5px;gap:4px;padding:4px 2px}#mainTabNav button span small{font-size:9px}#mainTabNav svg{width:17px!important;height:17px!important}}
+@media(max-width:330px){#mainTabNav button{flex-direction:column;gap:2px}#mainTabNav button span{font-size:10px;line-height:1.05}}
+
 #mainTabNav button[aria-selected="true"]{background:#143153;color:#71bcff}
 #mainTabNav button:focus-visible,.nw-btn:focus-visible,.nw-item button:focus-visible{outline:2px solid #0a84ff;outline-offset:2px}
 #mainTabNav svg{width:20px;height:20px}
@@ -82,3 +88,24 @@ body.nw-modal-open{overflow:hidden}
 #addTransactionButton{bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;z-index:60!important}
 body > main.max-w-md{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}
 body > footer{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}
+
+/* Native <details> panels preserve independent open state without storing
+   or altering Net Worth assets, linked-loan data or manual debts. */
+.nw-disclosure{display:block;min-width:0}
+.nw-disclosure > summary.nw-card-title{list-style:none;cursor:pointer;touch-action:manipulation;min-height:42px;margin:0;display:flex;align-items:center;justify-content:space-between;gap:7px;outline-offset:4px}
+.nw-disclosure > summary::-webkit-details-marker{display:none}
+.nw-disclosure > summary::marker{content:''}
+.nw-disclosure > summary:focus-visible{outline:2px solid #0a84ff;border-radius:8px}
+.nw-disclosure .nw-disclosure-name{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-size:15px!important;font-weight:750!important;color:#f2f2f7;line-height:1.3}
+.nw-disclosure .nw-disclosure-name small{font-size:10px!important;color:#a7a7b0;font-weight:500;white-space:nowrap}
+.nw-disclosure .nw-disclosure-right{display:flex;align-items:center;gap:9px;flex:0 0 auto;min-width:0}
+.nw-disclosure .nw-disclosure-right strong{font-size:12px;color:#b9dfff;font-weight:750;font-variant-numeric:tabular-nums;max-width:111px;overflow-wrap:anywhere;text-align:right}
+.nw-disclosure-chevron{width:9px;height:9px;display:inline-block;border-right:2px solid #9aa5b5;border-bottom:2px solid #9aa5b5;transform:rotate(45deg);transition:transform .16s ease;margin-right:3px}
+.nw-disclosure[open] .nw-disclosure-chevron{transform:rotate(225deg)}
+.nw-disclosure-body{margin-top:10px;padding-top:10px;border-top:1px solid #353541;display:flex;flex-direction:column;gap:9px}
+#loanLinkCard{display:block}
+.settings-page-header h2{font-size:19px;font-weight:800;line-height:1.2;color:white;margin:3px 0 7px}
+.settings-page-header p{font-size:12px;color:#aaaab6;line-height:1.55}
+#dataSettingsPanel section{width:100%;box-sizing:border-box}
+@media(max-width:365px){.nw-disclosure .nw-disclosure-name{font-size:13px!important}.nw-disclosure .nw-disclosure-right{gap:6px}.nw-disclosure .nw-disclosure-right strong{font-size:11.5px;max-width:95px}}
+@media(prefers-reduced-motion:reduce){.nw-disclosure-chevron{transition:none}}
