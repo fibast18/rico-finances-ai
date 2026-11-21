@@ -1,11 +1,11 @@
-// v1.8.14 — synthetic mobile navigation and settings/Net Worth disclosures.
+// v1.8.15 — synthetic mobile navigation and settings/Net Worth disclosures.
 // No user financial records, Firebase sessions or network requests are accessed.
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createContext,Script} from 'node:vm';
 const html=readFileSync('index.html','utf8');
 const css=readFileSync('net-worth.css','utf8');
-const source=readFileSync('net-worth-v1.8.14.js','utf8');
+const source=readFileSync('net-worth-v1.8.15.js','utf8');
 const pCash=html.indexOf('id="cashFlowPanel"'),pWorth=html.indexOf('id="netWorthPanel"'),pSettings=html.indexOf('id="dataSettingsPanel"');
 assert(pCash>0&&pWorth>pCash&&pSettings>pWorth,'Third tab must follow Cash Flow and Net Worth');
 assert.match(html,/<button id="tabDataSettings" role="tab" aria-controls="dataSettingsPanel"/);
@@ -76,7 +76,7 @@ const ctx={
  openModal(){modalOpens++}
 };
 ctx.window=ctx;ctx.globalThis=ctx;
-new Script(source,{filename:'net-worth-v1.8.14.js'}).runInContext(createContext(ctx));
+new Script(source,{filename:'net-worth-v1.8.15.js'}).runInContext(createContext(ctx));
 for(const cb of events.get('DOMContentLoaded')||[])cb();
 assert.equal(ctx.RICO_NET_WORTH.totals().netWorth,450);
 assert.match($('nwAssetsQuick').textContent,/750/);
