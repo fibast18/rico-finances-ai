@@ -15,10 +15,12 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="net-worth.css">
 <link rel="stylesheet" href="linked-loans.css">
+<link rel="stylesheet" href="linked-budget.css">
 <script src="icons.js"></script>
 <script src="analyst.js" defer></script>
-<script src="net-worth-v1.8.6.js" defer></script>
-<script src="linked-loans-v1.8.6.js" defer></script>
+<script src="net-worth-v1.8.7.js" defer></script>
+<script src="linked-loans-v1.8.7.js" defer></script>
+<script src="linked-budget-v1.8.7.js" defer></script>
 <style>
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:rgba(0,0,0,.1)}
@@ -138,7 +140,7 @@ body.ask-ai-open{overflow:hidden}
 @media(max-height:550px){.rico-chat-compose-area .rico-chat-check small{display:none}.rico-chat-messages{min-height:40px}}
 </style>
 <script src="ai-config.js" defer></script>
-<script src="ask-ai-v1.8.3.js" defer></script>
+<script src="ask-ai-v1.8.7.js" defer></script>
 </head>
 <body class="bg-black text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-iosBlue selection:text-white pb-safe">
 
@@ -232,6 +234,35 @@ body.ask-ai-open{overflow:hidden}
       <div class="flex justify-between text-[11px] text-iosGray mb-1"><span>Month Expense Ratio</span><span id="expenseRatioText">0% of income</span></div>
       <div class="w-full bg-black/50 h-2 rounded-full overflow-hidden"><div id="expenseRatioBar" class="bg-iosBlue h-full transition-all duration-500 rounded-full" style="width:0%"></div></div>
     </div>
+  </section>
+
+  <!-- Read-only family budget, separate from locally recorded cash transactions. -->
+  <section id="linkedBudgetCard" aria-labelledby="linkedBudgetTitle">
+    <div class="lb-head">
+      <div>
+        <strong id="linkedBudgetTitle">Family Budget · Loan Tracker</strong>
+        <small id="linkedBudgetMonth">Current month</small>
+      </div>
+      <button type="button" id="linkedBudgetRefresh">Refresh</button>
+    </div>
+    <p id="linkedBudgetStatus" class="lb-info" role="status" aria-live="polite">Checking linked budget…</p>
+    <div id="linkedBudgetContent" hidden>
+      <div class="lb-grid">
+        <div class="lb-stat income"><span>Planned Income</span><strong id="linkedBudgetIncome">₱0.00</strong></div>
+        <div class="lb-stat expense"><span>Regular Expenses</span><strong id="linkedBudgetExpenses">₱0.00</strong></div>
+        <div class="lb-stat expense"><span>Loan Deductions Counted</span><strong id="linkedBudgetDeductions">₱0.00</strong></div>
+        <div class="lb-stat remainder"><span>Planned Remainder</span><strong id="linkedBudgetRemaining">₱0.00</strong></div>
+      </div>
+      <p id="linkedBudgetBasis" class="lb-note"></p>
+      <details class="lb-details">
+        <summary>View income and expense categories</summary>
+        <h3 class="lb-section-title">Income sources</h3>
+        <div id="linkedBudgetIncomeRows"></div>
+        <h3 class="lb-section-title">Expense categories</h3>
+        <div id="linkedBudgetExpenseRows"></div>
+      </details>
+    </div>
+    <p class="lb-note">Planning figures only. These are not added to your recorded Cash Flow transactions or Net Worth assets. Edit the budget in Pono Family Loan Tracker.</p>
   </section>
 
   <!-- Quick Filter Ribbon -->
@@ -355,7 +386,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.6</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.7</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -554,7 +585,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.6';
+const RICO_APP_VERSION = '1.8.7';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
