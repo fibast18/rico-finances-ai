@@ -13,6 +13,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Rico Finances AI" id="iosAppTitle">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="financial-health.css">
 <link rel="stylesheet" href="net-worth.css">
 <link rel="stylesheet" href="linked-loans.css">
 <link rel="stylesheet" href="linked-budget.css">
@@ -20,6 +21,7 @@
 <link rel="stylesheet" href="linked-panels.css">
 <script src="icons.js"></script>
 <script src="analyst.js" defer></script>
+<script src="financial-health.js" defer></script>
 <script src="net-worth-v1.8.15.js" defer></script>
 <script src="linked-loans-v1.8.15.js" defer></script>
 <script src="linked-budget-v1.8.15.js" defer></script>
@@ -201,6 +203,15 @@ body.ask-ai-open{overflow:hidden}
 
 <main class="max-w-md mx-auto w-full px-4 py-4 flex-1">
 <div id="cashFlowPanel" role="tabpanel" aria-labelledby="tabCashFlow">
+<section id="financialHealthDashboard" class="fh-dashboard" aria-label="Financial Health Dashboard">
+<div class="fh-title"><h2>Financial Health</h2><span id="fhPeriod"></span></div>
+<div class="fh-grid">
+<div class="fh-card"><small>Savings rate</small><strong id="fhSavings">—</strong><span id="fhSavingsNote"></span></div>
+<div class="fh-card"><small>Debt-to-asset ratio</small><strong id="fhRatio">—</strong><span id="fhRatioNote"></span></div>
+<div class="fh-card"><small>Net worth</small><strong id="fhWorth">—</strong><span id="fhWorthNote"></span></div>
+<div class="fh-card"><small>Monthly cash flow · <em id="fhStatus"></em></small><strong id="fhCash">—</strong><span id="fhCashNote"></span></div>
+</div><p class="fh-foot">Actual transactions only · Utilities counted once · Loan balances are debts, not expenses · Budget plans excluded</p>
+</section>
 
   <!-- Backup reminder banner -->
   <section id="backupBanner" class="hidden bg-iosOrange/10 border border-iosOrange/30 rounded-2xl p-3 text-xs text-iosOrange flex items-center justify-between gap-2">
@@ -466,7 +477,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.15</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.16</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -677,7 +688,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.15';
+const RICO_APP_VERSION = '1.8.16';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
@@ -1085,6 +1096,7 @@ function renderApp() {
   updateMonthDisplay(); calculateBalances(); renderTransactions(); renderChartAndBreakdown();
   if (typeof window.renderFinanceAnalyst === 'function') window.renderFinanceAnalyst();
   persistData();
+  window.renderFinancialHealth?.();
   window.RICO_UTILITY_LINK?.render?.();
   // Adding, editing, deleting or importing transactions updates Net Worth at once.
   window.RICO_NET_WORTH?.render?.();
