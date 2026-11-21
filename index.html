@@ -16,11 +16,13 @@
 <link rel="stylesheet" href="net-worth.css">
 <link rel="stylesheet" href="linked-loans.css">
 <link rel="stylesheet" href="linked-budget.css">
+<link rel="stylesheet" href="linked-utilities.css">
 <script src="icons.js"></script>
 <script src="analyst.js" defer></script>
-<script src="net-worth-v1.8.10.js" defer></script>
-<script src="linked-loans-v1.8.10.js" defer></script>
-<script src="linked-budget-v1.8.10.js" defer></script>
+<script src="net-worth-v1.8.11.js" defer></script>
+<script src="linked-loans-v1.8.11.js" defer></script>
+<script src="linked-budget-v1.8.11.js" defer></script>
+<script src="linked-utilities-v1.8.11.js" defer></script>
 <style>
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:rgba(0,0,0,.1)}
@@ -140,7 +142,7 @@ body.ask-ai-open{overflow:hidden}
 @media(max-height:550px){.rico-chat-compose-area .rico-chat-check small{display:none}.rico-chat-messages{min-height:40px}}
 </style>
 <script src="ai-config.js" defer></script>
-<script src="ask-ai-v1.8.10.js" defer></script>
+<script src="ask-ai-v1.8.11.js" defer></script>
 </head>
 <body class="bg-black text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-iosBlue selection:text-white pb-safe">
 
@@ -265,6 +267,35 @@ body.ask-ai-open{overflow:hidden}
     <p class="lb-note">Planning figures only. These are not added to your recorded Cash Flow transactions or Net Worth assets. Edit the budget in Pono Family Loan Tracker.</p>
   </section>
 
+  <!-- Private, read-only utility payments from the existing Firebase Home Utilities app. -->
+  <section id="utilityLinkCard" aria-labelledby="utilityLinkTitle">
+    <div class="utility-link-title" id="utilityLinkTitle">🏠 Paid Home Utilities · Auto Sync</div>
+    <p class="utility-link-sub">Automatically include paid electricity, water, fuel, LPG and Camella dues in Cash Flow. Unpaid bills and meter readings are not included. The original utility app remains the source of truth.</p>
+    <div class="utility-link-kpis">
+      <div><span>Linked paid entries</span><strong id="utilityLinkCount">0</strong></div>
+      <div><span>Total linked expenses</span><strong id="utilityLinkTotal">₱0.00</strong></div>
+    </div>
+    <p id="utilityLinkStatus" role="status" aria-live="polite">Preparing private connection…</p>
+    <div id="utilityLinkAuthorizeGuide">
+      <p class="utility-link-note">One-time setup: Get your Finances connection ID, then open <a href="https://fibast18.github.io/rico-utility-monitor/" target="_blank" rel="noopener noreferrer" style="color:#88d1ff;text-decoration:underline">Rico's Integrated Home Utilities</a> → Backup → Connect Rico Finances AI. Approve the ID there, then press Connect now below.</p>
+    </div>
+    <div class="utility-link-actions">
+      <button type="button" id="utilityLinkGetId">Get connection ID</button>
+      <button type="button" id="utilityLinkCopyId">Copy ID</button>
+      <button type="button" id="utilityLinkConnect">Connect now</button>
+      <button type="button" id="utilityLinkDisconnect" class="utility-link-danger">Disconnect</button>
+    </div>
+    <div class="utility-link-id" id="utilityLinkDeviceId" role="status">Press Get connection ID</div>
+    <p class="utility-link-note utility-link-hidden" id="utilityLinkConnectedGuide" hidden>Connected read-only. New or edited paid expenses appear here automatically while online; cached values remain visible offline.</p>
+    <p class="utility-link-note" id="utilityLinkDuplicateStatus">No matching manual duplicates.</p>
+    <details class="utility-link-detail">
+      <summary>Review or exclude individual utility expenses</summary>
+      <div id="utilityLinkRows"></div>
+      <button id="utilityLinkShowAll" type="button" class="utility-link-actions" hidden>Show all paid entries</button>
+    </details>
+    <p id="utilityLinkCountNote" class="utility-link-note">Use the record date from Home Utilities. Review historical bills if payment occurred on a different day.</p>
+  </section>
+
   <!-- Quick Filter Ribbon -->
   <section class="flex items-center justify-between gap-2">
     <div class="flex bg-iosCardDark p-1 rounded-2xl border border-iosBorderDark w-full text-xs font-medium">
@@ -386,7 +417,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.10</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.11</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -585,7 +616,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.10';
+const RICO_APP_VERSION = '1.8.11';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
@@ -965,13 +996,22 @@ function updateGreeting() {
 function formatPHP(amount) {
   return new Intl.NumberFormat('en-PH', { style:'currency', currency:'PHP', minimumFractionDigits:2 }).format(amount).replace('PHP', '₱');
 }
+// Keep manual Cash Flow localStorage untouched: linked paid utilities are a read-only
+// overlay, keyed by original utility IDs and deduplicated against matching manual rows.
+window.RICO_MANUAL_CASH_FLOW=()=>transactions.slice();
+function getAllCashFlowTransactions(){
+  return window.RICO_UTILITY_LINK?.merge(transactions)||transactions;
+}
+window.RICO_GET_ALL_CASH_FLOW=getAllCashFlowTransactions;
 function getMonthFilteredTransactions() {
   const y = selectedDate.getFullYear(), m = selectedDate.getMonth();
-  return transactions.filter(t => { const d = parseLocalDate(t.date); return d.getFullYear() === y && d.getMonth() === m; });
+  return getAllCashFlowTransactions().filter(t => {
+    const d = parseLocalDate(t.date); return d.getFullYear() === y && d.getMonth() === m;
+  });
 }
 // The single source of truth for both Cash Flow and the read-only Net Worth cash row.
 function currentCashFlowBalance() {
-  const net=transactions.reduce((total,t)=>{
+  const net=getAllCashFlowTransactions().reduce((total,t)=>{
     if(t?.type!=='income'&&t?.type!=='expense')return total;
     const amount=Number(t.amount);
     if(!Number.isFinite(amount))return total;
@@ -984,9 +1024,11 @@ function renderApp() {
   updateMonthDisplay(); calculateBalances(); renderTransactions(); renderChartAndBreakdown();
   if (typeof window.renderFinanceAnalyst === 'function') window.renderFinanceAnalyst();
   persistData();
+  window.RICO_UTILITY_LINK?.render?.();
   // Adding, editing, deleting or importing transactions updates Net Worth at once.
   window.RICO_NET_WORTH?.render?.();
 }
+window.RICO_RENDER_CASH_FLOW=()=>renderApp();
 function calculateBalances() {
   const sum = (arr, type) => arr.filter(t => t.type === type).reduce((a, t) => a + parseFloat(t.amount), 0);
   const net = currentCashFlowBalance();
@@ -1014,7 +1056,7 @@ function renderTransactions() {
   const term = document.getElementById('searchInput').value.toLowerCase();
   let filtered = getMonthFilteredTransactions().filter(t => currentFilter === 'all' || t.type === currentFilter);
   if (term) filtered = filtered.filter(t => t.desc.toLowerCase().includes(term) || t.category.toLowerCase().includes(term));
-  filtered.sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+  filtered.sort((a, b) => b.date.localeCompare(a.date) || String(b.id).localeCompare(String(a.id)));
   document.getElementById('txCount').textContent = `${filtered.length} items`;
   if (!filtered.length) { listEl.innerHTML = ''; emptyEl.classList.remove('hidden'); return; }
   emptyEl.classList.add('hidden');
@@ -1035,8 +1077,10 @@ function renderTransactions() {
       </div>
       <div class="flex items-center gap-2 flex-shrink-0">
         <span class="text-sm font-extrabold ${isExp ? 'text-iosRed' : 'text-iosGreen'}">${isExp ? '-' : '+'}${formatPHP(t.amount)}</span>
-        <button onclick="editTransaction(${t.id})" class="text-iosGray hover:text-iosBlue p-1 transition" title="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-        <button onclick="deleteTransaction(${t.id})" class="text-iosGray hover:text-iosRed p-1 transition" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        ${t.linkedUtility
+          ? '<a class="utility-source-tag" href="https://fibast18.github.io/rico-utility-monitor/" target="_blank" rel="noopener noreferrer" title="View original paid bill in Home Utilities">LINKED</a>'
+          : `<button onclick="editTransaction(${t.id})" class="text-iosGray hover:text-iosBlue p-1 transition" title="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+        <button onclick="deleteTransaction(${t.id})" class="text-iosGray hover:text-iosRed p-1 transition" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`}
       </div>
     </div>`;
   }).join('');
