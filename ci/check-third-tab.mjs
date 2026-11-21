@@ -1,25 +1,26 @@
-// v1.8.13 — synthetic mobile navigation and settings/Net Worth disclosures.
+// v1.8.14 — synthetic mobile navigation and settings/Net Worth disclosures.
 // No user financial records, Firebase sessions or network requests are accessed.
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createContext,Script} from 'node:vm';
 const html=readFileSync('index.html','utf8');
 const css=readFileSync('net-worth.css','utf8');
-const source=readFileSync('net-worth-v1.8.13.js','utf8');
+const source=readFileSync('net-worth-v1.8.14.js','utf8');
 const pCash=html.indexOf('id="cashFlowPanel"'),pWorth=html.indexOf('id="netWorthPanel"'),pSettings=html.indexOf('id="dataSettingsPanel"');
 assert(pCash>0&&pWorth>pCash&&pSettings>pWorth,'Third tab must follow Cash Flow and Net Worth');
 assert.match(html,/<button id="tabDataSettings" role="tab" aria-controls="dataSettingsPanel"/);
 const cashPart=html.slice(pCash,pWorth),worthPart=html.slice(pWorth,pSettings),settingPart=html.slice(pSettings,html.indexOf('</main>',pSettings));
 for(const target of ['id="lastBackupText"','id="importFileInput"','checkForAppUpdates()',
- 'copyFromSharedFinances()','id="nwImportFile"','id="netWorthSaveStatus"']){
+ 'id="netWorthSaveStatus"']){
  assert(settingPart.includes(target),'Missing moved settings control '+target);
  assert(!cashPart.includes(target)&&!worthPart.includes(target),'Settings control still on old tab: '+target);
  if(target.startsWith('id="'))assert.equal(html.split(target).length-1,1,'Duplicate control ID: '+target);
 }
 assert.match(settingPart,/onclick="exportData\(\)"/);
-assert.match(settingPart,/onclick="exportNetWorth\(\)"/);
-assert.match(settingPart,/onclick="document\.getElementById\('nwImportFile'\)\.click\(\)"/);
-assert.match(settingPart,/onchange="importNetWorth\(event\)"/);
+assert.match(settingPart,/onchange="importData\(event\)"/);
+assert.match(settingPart,/Export All/);
+assert.match(settingPart,/Import All/);
+assert(!/Copy Records from Shared App|copyFromSharedFinances|id="nwImportFile"/.test(settingPart));
 for(const [id,body] of [['nwAssetsCard','nwAssetsBody'],['loanLinkCard','nwLoanBody'],['nwDebtsCard','nwDebtsBody']]){
  const open=new RegExp('<details\\b[^>]*id="'+id+'"[^>]*>');
  const found=worthPart.match(open);
@@ -75,7 +76,7 @@ const ctx={
  openModal(){modalOpens++}
 };
 ctx.window=ctx;ctx.globalThis=ctx;
-new Script(source,{filename:'net-worth-v1.8.13.js'}).runInContext(createContext(ctx));
+new Script(source,{filename:'net-worth-v1.8.14.js'}).runInContext(createContext(ctx));
 for(const cb of events.get('DOMContentLoaded')||[])cb();
 assert.equal(ctx.RICO_NET_WORTH.totals().netWorth,450);
 assert.match($('nwAssetsQuick').textContent,/750/);
