@@ -29,6 +29,7 @@ const shapes = {
  'trending-up':'<path d="m3 17 6-6 4 4 8-8M15 7h6v6"/>',
  'gift':'<rect x="3" y="9" width="18" height="12" rx="2"/><path d="M12 9v12M3 13h18M12 9H7a3 3 0 1 1 3-3l2 3ZM12 9h5a3 3 0 1 0-3-3l-2 3Z"/>',
  'tag':'<path d="M20 13 13 20 3 10V3h7l10 10Z"/><circle cx="7" cy="7" r="1"/>',
+ 'settings':'<path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
  'more-vertical':'<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>'
 };
 function createIcons() {
