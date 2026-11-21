@@ -1,9 +1,9 @@
-// Rico Finances AI offline-first service worker — v1.8.4
+// Rico Finances AI offline-first service worker — v1.8.5
 // Works on GitHub Pages root sites and subdirectory project sites.
-const CACHE_NAME = 'private-rico-ai-shell-v1.8.4';
+const CACHE_NAME = 'private-rico-ai-shell-v1.8.5';
 const CACHE_PREFIX = 'private-rico-ai-shell-';
 const APP_SHELL = [
-  './', './index.html', './styles.css', './net-worth.css', './icons.js', './analyst.js', './net-worth.js', './ai-config.js', './ask-ai-v1.8.3.js',
+  './', './index.html', './styles.css', './net-worth.css', './linked-loans.css', './icons.js', './analyst.js', './net-worth.js', './linked-loans.js', './ai-config.js', './ask-ai-v1.8.3.js',
   './manifest.webmanifest', './version.json',
   './my-finances-icon-192.png', './my-finances-icon-512.png', './my-finances-maskable-512.png',
   './my-finances-apple-touch-icon.png', './favicon-48.png'
