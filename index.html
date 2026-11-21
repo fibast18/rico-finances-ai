@@ -17,12 +17,14 @@
 <link rel="stylesheet" href="linked-loans.css">
 <link rel="stylesheet" href="linked-budget.css">
 <link rel="stylesheet" href="linked-utilities.css">
+<link rel="stylesheet" href="linked-panels.css">
 <script src="icons.js"></script>
 <script src="analyst.js" defer></script>
-<script src="net-worth-v1.8.11.js" defer></script>
-<script src="linked-loans-v1.8.11.js" defer></script>
-<script src="linked-budget-v1.8.11.js" defer></script>
-<script src="linked-utilities-v1.8.11.js" defer></script>
+<script src="net-worth-v1.8.12.js" defer></script>
+<script src="linked-loans-v1.8.12.js" defer></script>
+<script src="linked-budget-v1.8.12.js" defer></script>
+<script src="linked-utilities-v1.8.12.js" defer></script>
+<script src="linked-panels-v1.8.12.js" defer></script>
 <style>
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:rgba(0,0,0,.1)}
@@ -142,7 +144,7 @@ body.ask-ai-open{overflow:hidden}
 @media(max-height:550px){.rico-chat-compose-area .rico-chat-check small{display:none}.rico-chat-messages{min-height:40px}}
 </style>
 <script src="ai-config.js" defer></script>
-<script src="ask-ai-v1.8.11.js" defer></script>
+<script src="ask-ai-v1.8.12.js" defer></script>
 </head>
 <body class="bg-black text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-iosBlue selection:text-white pb-safe">
 
@@ -240,13 +242,20 @@ body.ask-ai-open{overflow:hidden}
 
   <!-- Read-only family budget, separate from locally recorded cash transactions. -->
   <section id="linkedBudgetCard" aria-labelledby="linkedBudgetTitle">
-    <div class="lb-head">
-      <div>
+    <button type="button" class="linked-collapse-toggle" id="linkedBudgetToggle"
+      aria-expanded="false" aria-controls="linkedBudgetPanel">
+      <span class="linked-collapse-label">
         <strong id="linkedBudgetTitle">Family Budget · Loan Tracker</strong>
         <small id="linkedBudgetMonth">Current month</small>
-      </div>
-      <span class="lb-auto-indicator" aria-label="Automatic synchronization enabled">● Auto-sync</span>
-    </div>
+      </span>
+      <span class="linked-collapse-side">
+        <span class="linked-collapse-quick" id="linkedBudgetQuick">Checking connection…</span>
+        <svg class="linked-collapse-chevron" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </span>
+    </button>
+    <div id="linkedBudgetPanel" class="linked-collapse-body" hidden>
+      <div class="linked-collapse-sync-label"><span class="lb-auto-indicator">● Auto-sync</span></div>
     <p id="linkedBudgetStatus" class="lb-info" role="status" aria-live="polite">Checking linked budget…</p>
     <div id="linkedBudgetContent" hidden>
       <div class="lb-grid">
@@ -265,11 +274,24 @@ body.ask-ai-open{overflow:hidden}
       </details>
     </div>
     <p class="lb-note">Planning figures only. These are not added to your recorded Cash Flow transactions or Net Worth assets. Edit the budget in Pono Family Loan Tracker.</p>
+    </div>
   </section>
 
   <!-- Private, read-only utility payments from the existing Firebase Home Utilities app. -->
   <section id="utilityLinkCard" aria-labelledby="utilityLinkTitle">
-    <div class="utility-link-title" id="utilityLinkTitle">🏠 Paid Home Utilities · Auto Sync</div>
+    <button type="button" class="linked-collapse-toggle" id="utilityLinkToggle"
+      aria-expanded="false" aria-controls="utilityLinkPanel">
+      <span class="linked-collapse-label">
+        <strong id="utilityLinkTitle">🏠 Paid Home Utilities</strong>
+        <small>Auto-sync</small>
+      </span>
+      <span class="linked-collapse-side">
+        <span class="linked-collapse-quick" id="utilityLinkQuick">Checking connection…</span>
+        <svg class="linked-collapse-chevron" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </span>
+    </button>
+    <div id="utilityLinkPanel" class="linked-collapse-body" hidden>
     <p class="utility-link-sub">Automatically include paid electricity, water, fuel, LPG and Camella dues in Cash Flow. Unpaid bills and meter readings are not included. The original utility app remains the source of truth.</p>
     <div class="utility-link-kpis">
       <div><span>Linked paid entries</span><strong id="utilityLinkCount">0</strong></div>
@@ -294,6 +316,7 @@ body.ask-ai-open{overflow:hidden}
       <button id="utilityLinkShowAll" type="button" class="utility-link-actions" hidden>Show all paid entries</button>
     </details>
     <p id="utilityLinkCountNote" class="utility-link-note">Use the record date from Home Utilities. Review historical bills if payment occurred on a different day.</p>
+    </div>
   </section>
 
   <!-- Quick Filter Ribbon -->
@@ -417,7 +440,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.11</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.12</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -616,7 +639,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.11';
+const RICO_APP_VERSION = '1.8.12';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
