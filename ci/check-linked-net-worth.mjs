@@ -54,7 +54,7 @@ const context={
 context.window=context;
 context.globalThis=context;
 const vm=createContext(context);
-for(const file of ['net-worth-v1.8.10.js','linked-loans-v1.8.10.js']){
+for(const file of ['net-worth-v1.8.11.js','linked-loans-v1.8.11.js']){
  new Script(readFileSync(file,'utf8'),{filename:file}).runInContext(vm);
 }
 assert.equal(context.RICO_NET_WORTH.version,context.RICO_LINKED_LOANS.version,'Related modules must match');
