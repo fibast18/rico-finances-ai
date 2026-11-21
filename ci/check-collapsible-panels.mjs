@@ -6,14 +6,14 @@ import {Script,createContext} from 'node:vm';
 
 const html=readFileSync('index.html','utf8');
 const css=readFileSync('linked-panels.css','utf8');
-const js=readFileSync('linked-panels-v1.8.12.js','utf8');
+const js=readFileSync('linked-panels-v1.8.13.js','utf8');
 for(const [toggle,panel] of [['linkedBudgetToggle','linkedBudgetPanel'],['utilityLinkToggle','utilityLinkPanel']]){
  assert.match(html,new RegExp('id="'+toggle+'"[^>]*aria-expanded="false"[^>]*aria-controls="'+panel+'"'));
  assert.match(html,new RegExp('id="'+panel+'"[^>]*hidden'),'Panel '+panel+' must start collapsed');
 }
 assert.match(css,/\.linked-collapse-body\[hidden\]\{display:none!important\}/);
-assert.match(readFileSync('linked-loans-v1.8.12.js','utf8'),/setInterval\(/,'Loan auto sync retained');
-assert.match(readFileSync('linked-utilities-v1.8.12.js','utf8'),/onSnapshot\(/,'Firebase change listener retained');
+assert.match(readFileSync('linked-loans-v1.8.13.js','utf8'),/setInterval\(/,'Loan auto sync retained');
+assert.match(readFileSync('linked-utilities-v1.8.13.js','utf8'),/onSnapshot\(/,'Firebase change listener retained');
 
 const elements=new Map(),events=new Map(),observers=[];
 class Observer{
@@ -42,7 +42,7 @@ const document={
  addEventListener:(type,callback)=>events.set(type,callback)
 };
 const vm=createContext({document,MutationObserver:Observer,console});
-new Script(js,{filename:'linked-panels-v1.8.12.js'}).runInContext(vm);
+new Script(js,{filename:'linked-panels-v1.8.13.js'}).runInContext(vm);
 events.get('DOMContentLoaded')();
 const b=get('linkedBudgetToggle'),u=get('utilityLinkToggle');
 assert.equal(b.getAttribute('aria-expanded'),'false');
