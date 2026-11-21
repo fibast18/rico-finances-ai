@@ -17,7 +17,7 @@ assert(!/Copy Records from Shared App|copyFromSharedFinances|Net Worth Backup|nw
 assert(!html.includes('function copyFromSharedFinances()'),'Legacy shared-app copy must be removed');
 assert.match(html,/window\.RICO_FULL_BACKUP\.makePayload\(\)/);
 assert.match(html,/window\.RICO_FULL_BACKUP\.importFile\(file\)/);
-assert.match(html,/backup-manager-v1\.8\.14\.js/);
+assert.match(html,/backup-manager-v1\.8\.15\.js/);
 assert(!/id="nwImportFile"/.test(html),'Separate Net Worth import must be removed');
 const CASH='rico_finances_ai_txs', FALL='rico_finances_ai_backup_fallback';
 const NET='rico_finances_ai_net_worth_v1';
