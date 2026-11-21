@@ -88,6 +88,11 @@ const autoTest=spawnSync(process.execPath, ['ci/check-auto-sync.mjs'],
 assert(autoTest.status===0,
   'Automatic linked-finance sync regression failed: '+(autoTest.stderr||autoTest.stdout));
 process.stdout.write(autoTest.stdout||'');
+const cashTest=spawnSync(process.execPath, ['ci/check-cash-to-net-worth.mjs'],
+  {cwd:root,encoding:'utf8'});
+assert(cashTest.status===0,
+  'Cash Flow → Net Worth / compact rows regression failed: '+(cashTest.stderr||cashTest.stdout));
+process.stdout.write(cashTest.stdout||'');
 assert(publish.length >= required.length, 'Unexpectedly small publication set');
 const dest = join(root, 'dist');
 rmSync(dest, { recursive: true, force: true });
