@@ -145,6 +145,11 @@
       `TOP lifetime expense categories: ${topCats||'no expenses'}.`,
       `LAST 6 recorded months: ${recentMonths||'no records'}.`
     ];
+    // Net Worth is a separate manually entered on-device ledger. Read-only snapshot
+    // is included ONLY when the user has explicitly enabled ledger sharing.
+    const netWorthLine = typeof window.RICO_NET_WORTH?.aiSummary === 'function'
+      ? window.RICO_NET_WORTH.aiSummary().slice(0,350) : '';
+    if (netWorthLine) facts.push(netWorthLine);
     // Every year is included if it fits; omit old years at payload size limit and report that plainly.
     const yearsLine='YEAR totals: '+years.join(';');
     if(yearsLine.length<=450)facts.push(yearsLine+'.');
@@ -180,7 +185,7 @@
       }
       if(body.length>CONTEXT_LIMIT){
         // Very large custom category names/years: use compact guaranteed answer.
-        body=[facts[0],facts[1],facts.find(s=>s.startsWith('QUESTION FOCUS')),`Records analyzed=${allCount}; details sent=0; app figures derived from entire local ledger.`].join('\n').slice(0,CONTEXT_LIMIT);
+        body=[facts[0],facts[1],netWorthLine,facts.find(s=>s.startsWith('QUESTION FOCUS')),`Records analyzed=${allCount}; details sent=0; app figures derived from entire local ledger.`].filter(Boolean).join('\n').slice(0,CONTEXT_LIMIT);
         used=0;
       }
     }

@@ -1,0 +1,55 @@
+/* Rico Finances AI v1.8.4 — minimal iPhone Net Worth tab */
+#cashFlowPanel[hidden],#netWorthPanel[hidden],#nwDialog[hidden]{display:none!important}
+#cashFlowPanel{display:flex;flex-direction:column;gap:20px}
+#netWorthPanel{display:flex;flex-direction:column;gap:17px}
+#mainTabNav{position:fixed;z-index:45;inset:auto 0 0;background:rgba(19,20,23,.97);border-top:1px solid #3a3a3f;padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center;gap:12px;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+#mainTabNav button{flex:1 1 0;max-width:212px;min-height:48px;background:transparent;color:#a5a5af;border-radius:13px;border:0;display:flex;align-items:center;justify-content:center;gap:9px;font-size:13px;font-weight:700;touch-action:manipulation;cursor:pointer}
+#mainTabNav button[aria-selected="true"]{background:#143153;color:#71bcff}
+#mainTabNav button:focus-visible,.nw-btn:focus-visible,.nw-item button:focus-visible{outline:2px solid #0a84ff;outline-offset:2px}
+#mainTabNav svg{width:20px;height:20px}
+.floating-add-btn{bottom:calc(85px + env(safe-area-inset-bottom,0px))!important;z-index:46!important}
+body>main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))!important}
+.nw-balance{border:1px solid #2f3540;background:linear-gradient(137deg,#212b3e,#171a24 70%);border-radius:24px;padding:21px;box-shadow:0 12px 25px rgba(0,0,0,.16)}
+.nw-label{text-transform:uppercase;letter-spacing:.075em;color:#a8b3c5;font-size:11px;font-weight:700}
+.nw-value{margin:9px 0 16px;font-size:clamp(25px,7.7vw,38px);line-height:1.16;font-weight:800;overflow-wrap:anywhere;color:#f4f8ff;font-variant-numeric:tabular-nums}
+.nw-negative{color:#ff776f!important}
+.nw-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nw-mini{background:#111723;border:1px solid #2d3648;border-radius:15px;padding:12px;min-width:0}
+.nw-mini span{font-size:11px;color:#b4bdca;display:block}
+.nw-mini strong{display:block;margin-top:5px;font-size:clamp(13px,4vw,17px);overflow-wrap:anywhere;line-height:1.2;font-variant-numeric:tabular-nums}
+.nw-mini.asset strong{color:#51db90}.nw-mini.liability strong{color:#ff857c}
+.nw-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nw-btn{min-height:44px;border:1px solid #3c4659;border-radius:13px;color:#edf3fc;font-size:13px;font-weight:750;padding:10px 12px;text-align:center;touch-action:manipulation;background:#263044}
+.nw-btn-primary{background:#087af0;border-color:#087af0;color:white}
+.nw-card{background:#1c1c1e;border:1px solid #303034;border-radius:20px;padding:15px}
+.nw-card-title{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px;font-weight:750;margin-bottom:10px}
+.nw-card-title span{font-size:11px;color:#a7a7b0;font-weight:500}
+.nw-item{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;row-gap:7px;padding:11px 0;border-top:1px solid #303033}
+.nw-item-info{min-width:0;display:flex;flex-direction:column;gap:3px}
+.nw-item-info strong{font-size:13px;overflow-wrap:anywhere;line-height:1.3}
+.nw-item-info span{font-size:11px;color:#a2a2ad}
+.nw-item-amount{font-size:13px;font-weight:750;max-width:144px;text-align:right;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.nw-item-actions{grid-column:1 / -1;display:flex;justify-content:flex-end;gap:10px}
+.nw-item-actions button{border-radius:9px;border:1px solid #3c4554;color:#c2dcff;font-size:11px;padding:5px 12px;min-height:32px;background:#262a33}
+.nw-item-actions .nw-delete{color:#ffaaa5}
+.nw-empty{font-size:12px;color:#9c9ca8;line-height:1.5;padding:12px 0 3px}
+.nw-hint{font-size:11px;line-height:1.55;color:#a7a7b2}
+#netWorthSaveStatus{font-size:11px;line-height:1.4;color:#e2b079}
+#nwDialog{position:fixed;inset:0;z-index:135;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;justify-content:center;padding:14px 12px calc(10px + env(safe-area-inset-bottom,0px));box-sizing:border-box}
+.nw-modal{max-width:430px;width:100%;max-height:calc(92dvh - env(safe-area-inset-top,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;box-sizing:border-box;background:#1d1e22;border:1px solid #414149;padding:18px;border-radius:24px 24px 18px 18px;box-shadow:0 15px 65px #000a}
+.nw-modal-title{font-size:18px;font-weight:800}
+.nw-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.nw-modal-close{width:34px;height:34px;border-radius:50%;background:#33353b;color:#fff;font-size:22px}
+.nw-type-switch{display:grid;grid-template-columns:1fr 1fr;background:#0e0f14;border-radius:13px;padding:4px;gap:4px;margin-bottom:14px}
+.nw-type-switch button{min-height:42px;color:#aaa;border-radius:10px;font-size:13px;font-weight:700}
+.nw-type-switch button.selected{background:#167bed;color:#fff}
+.nw-modal label{display:block;color:#d3d4df;font-size:12px;font-weight:650;margin:12px 0 6px}
+.nw-modal input,.nw-modal select{width:100%;height:45px;box-sizing:border-box;color:#fff;background:#11141b;border:1px solid #414653;border-radius:12px;padding:10px;font-size:16px}
+.nw-save-button{margin-top:17px;width:100%;border-radius:13px;padding:14px 10px;background:#0a84ff;color:#fff;font-size:14px;font-weight:800;min-height:48px}
+body.nw-modal-open{overflow:hidden}
+@media(min-width:550px){#nwDialog{align-items:center}.nw-modal{border-radius:24px}}
+@media(max-width:350px){#mainTabNav button{font-size:12px;gap:5px}.nw-item-amount{max-width:110px}}
+/* Override the legacy floating-button inline/important styles safely. */
+#addTransactionButton{bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;z-index:60!important}
+body > main.max-w-md{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}
+body > footer{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}

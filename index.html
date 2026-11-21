@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Rico Finances AI - Private Cash Flow Tracker</title>
+<title>Rico Finances AI - Private Cash Flow & Net Worth Tracker</title>
 <link rel="apple-touch-icon" sizes="180x180" href="my-finances-apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#000000">
@@ -13,8 +13,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Rico Finances AI" id="iosAppTitle">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="net-worth.css">
 <script src="icons.js"></script>
 <script src="analyst.js" defer></script>
+<script src="net-worth.js" defer></script>
 <style>
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:rgba(0,0,0,.1)}
@@ -172,12 +174,13 @@ body.ask-ai-open{overflow:hidden}
   </div>
 </header>
 
-<!-- Persistent action control: bottom-left, 1.5x previous 43px header button. -->
-<button id="addTransactionButton" type="button" aria-label="Add transaction" title="Add transaction" onclick="openModal()" class="floating-add-btn" style="position:fixed;left:auto;right:18px;bottom:calc(24px + env(safe-area-inset-bottom, 0px));width:66px;height:66px;z-index:45;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#0a84ff;color:#fff;box-shadow:0 10px 30px rgba(10,132,255,.4)">
+<!-- Context-aware action: transaction on Cash Flow; asset/debt on Net Worth. -->
+<button id="addTransactionButton" type="button" aria-label="Add transaction" title="Add transaction" onclick="openSectionAdd()" class="floating-add-btn" style="position:fixed;left:auto;right:18px;bottom:calc(24px + env(safe-area-inset-bottom, 0px));width:66px;height:66px;z-index:45;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#0a84ff;color:#fff;box-shadow:0 10px 30px rgba(10,132,255,.4)">
   <i data-lucide="plus" class="w-8 h-8"></i>
 </button>
 
-<main class="max-w-md mx-auto w-full px-4 py-4 space-y-5 flex-1">
+<main class="max-w-md mx-auto w-full px-4 py-4 flex-1">
+<div id="cashFlowPanel" role="tabpanel" aria-labelledby="tabCashFlow">
 
   <!-- Backup reminder banner -->
   <section id="backupBanner" class="hidden bg-iosOrange/10 border border-iosOrange/30 rounded-2xl p-3 text-xs text-iosOrange flex items-center justify-between gap-2">
@@ -283,11 +286,55 @@ body.ask-ai-open{overflow:hidden}
     <p class="text-[10px] text-iosGray">Optional: copies records from the original My Finances app only when both apps use the same browser website origin. Does not change the original. Export a backup first.</p>
     <button onclick="checkForAppUpdates()" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-iosBlue/10 border border-iosBlue/30 text-iosCyan hover:bg-iosBlue/20 transition font-semibold text-xs"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Check for App Update</button>
   </section>
+</div>
+<div id="netWorthPanel" role="tabpanel" aria-labelledby="tabNetWorth" hidden>
+  <div>
+    <h2 style="font-weight:800;font-size:19px;line-height:1.2;margin:3px 0 5px">Net Worth</h2>
+    <p class="nw-hint">Your assets minus your debts, all in one place.</p>
+  </div>
+  <section class="nw-balance" aria-label="Net worth summary">
+    <div class="nw-label">Your estimated net worth</div>
+    <div id="netWorthTotal" class="nw-value" aria-live="polite">₱0.00</div>
+    <div class="nw-mini-grid">
+      <div class="nw-mini asset"><span>Total Assets</span><strong id="netWorthAssets">₱0.00</strong></div>
+      <div class="nw-mini liability"><span>Total Debts</span><strong id="netWorthLiabilities">₱0.00</strong></div>
+    </div>
+  </section>
+  <div class="nw-actions">
+    <button type="button" class="nw-btn nw-btn-primary" onclick="openNetWorthForm('asset')">+ Add Asset</button>
+    <button type="button" class="nw-btn" onclick="openNetWorthForm('liability')">+ Add Debt</button>
+  </div>
+  <section class="nw-card">
+    <div class="nw-card-title">Assets <span id="netWorthAssetCount">0 items</span></div>
+    <div id="netWorthAssetList"></div>
+  </section>
+  <section class="nw-card">
+    <div class="nw-card-title">Debts <span id="netWorthLiabilityCount">0 items</span></div>
+    <div id="netWorthLiabilityList"></div>
+  </section>
+  <section class="nw-card" style="display:flex;flex-direction:column;gap:12px">
+    <strong style="font-size:14px">Net Worth backup</strong>
+    <div class="nw-actions">
+      <button class="nw-btn" type="button" onclick="exportNetWorth()">Export</button>
+      <button class="nw-btn" type="button" onclick="document.getElementById('nwImportFile').click()">Import</button>
+      <input id="nwImportFile" type="file" accept=".json,application/json" hidden onchange="importNetWorth(event)">
+    </div>
+    <p class="nw-hint">These values stay on this device. This backup is separate from your Cash Flow transaction backup. Save both.</p>
+    <p class="nw-hint">Enter what each asset is worth today and each debt's remaining balance. Cash Flow's income-minus-expenses figure is <strong>not</strong> automatically counted, so you avoid double counting.</p>
+    <p id="netWorthSaveStatus" aria-live="polite"></p>
+  </section>
+</div>
 </main>
+
+<!-- iPhone-friendly bottom navigation; both panels stay on the same website and storage. -->
+<nav id="mainTabNav" role="tablist" aria-label="Finance sections">
+  <button id="tabCashFlow" role="tab" aria-controls="cashFlowPanel" aria-selected="true" type="button"><i data-lucide="list" class="w-5 h-5"></i> Cash Flow</button>
+  <button id="tabNetWorth" role="tab" aria-controls="netWorthPanel" aria-selected="false" tabindex="-1" type="button"><i data-lucide="pie-chart" class="w-5 h-5"></i> Net Worth</button>
+</nav>
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.3</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.4</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -431,6 +478,23 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 
+<!-- Offline-first Net Worth edit sheet. -->
+<div id="nwDialog" role="dialog" aria-modal="true" aria-labelledby="nwDialogTitle" hidden>
+  <div class="nw-modal">
+    <div class="nw-modal-head"><h2 class="nw-modal-title" id="nwDialogTitle">Add to Net Worth</h2><button class="nw-modal-close" type="button" aria-label="Close Net Worth entry" onclick="closeNetWorthForm()">×</button></div>
+    <form id="nwForm">
+      <div class="nw-type-switch" role="group" aria-label="Entry type">
+        <button id="nwAssetType" type="button" class="selected" aria-pressed="true" onclick="setNetWorthKind('asset')">Asset</button>
+        <button id="nwLiabilityType" type="button" aria-pressed="false" onclick="setNetWorthKind('liability')">Debt</button>
+      </div>
+      <label for="nwName">Name</label><input id="nwName" maxlength="80" required placeholder="e.g. Savings account, House, Car" autocomplete="off">
+      <label for="nwCategory">Category</label><select id="nwCategory" required></select>
+      <label for="nwAmount" id="nwAmountLabel">Current value (₱)</label><input id="nwAmount" type="number" inputmode="decimal" required min="0" max="1000000000000000" step="0.01" placeholder="0.00">
+      <button type="submit" class="nw-save-button">Save</button>
+    </form>
+  </div>
+</div>
+
 <!-- Read-only paid Ask AI via existing shared Worker. Messenger interface v1.8.3. -->
 <div id="askAiDialog" class="ask-ai-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="askAiTitle">
   <section class="ask-ai-panel ask-ai-messenger" tabindex="-1">
@@ -469,7 +533,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.3';
+const RICO_APP_VERSION = '1.8.4';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
