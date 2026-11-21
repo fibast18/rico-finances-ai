@@ -1,0 +1,19 @@
+/* Rico Finances AI v1.8.5: compact iPhone read-only Loan Tracker connection */
+#loanLinkCard{display:flex;flex-direction:column;gap:10px}
+#loanLinkCard .nw-card-title{margin-bottom:0}
+.nw-link-status{font-size:12px;color:#bed9ef;line-height:1.5;margin:0;overflow-wrap:anywhere}
+.nw-link-error{color:#ff9c92}
+.nw-link-connect{display:grid;grid-template-columns:1fr;gap:9px}
+.nw-link-connect label{font-size:12px;font-weight:650;color:#d8e4ee}
+.nw-link-connect input{box-sizing:border-box;width:100%;min-height:46px;border:1px solid #4b556a;border-radius:12px;padding:11px 13px;background:#12151e;color:#fff;font-size:16px}
+.nw-link-connect input:focus-visible{outline:2px solid #0a84ff;outline-offset:2px}
+.nw-link-open{min-height:34px;text-align:center;display:block;font-size:12px;color:#8dccff;text-decoration:underline;text-underline-offset:3px;padding:8px}
+#loanLinkConnectedArea[hidden],#loanLinkConnectArea[hidden]{display:none!important}
+#loanLinkItems:empty{display:none}
+.nw-link-item{border-top:1px solid #383b47;display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:center;min-height:49px;padding:7px 0;cursor:pointer}
+.nw-link-item input{width:19px;height:19px;accent-color:#0a84ff}
+.nw-link-name{font-size:13px;font-weight:650;color:#eef1f7;overflow-wrap:anywhere}
+.nw-link-item strong{font-size:12px;font-weight:750;color:#ff8b82;font-variant-numeric:tabular-nums;white-space:nowrap}
+.nw-link-total{border-top:1px solid #383b47;padding-top:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:#bfc6d3}
+.nw-link-total strong{color:#ffada8;font-size:14px;font-variant-numeric:tabular-nums}
+@media(max-width:365px){.nw-link-item{grid-template-columns:22px minmax(0,1fr);gap:7px}.nw-link-item strong{grid-column:2;text-align:left}}
