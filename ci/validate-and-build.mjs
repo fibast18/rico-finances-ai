@@ -83,6 +83,11 @@ const budgetTest = spawnSync(process.execPath, ['ci/check-linked-budget.mjs'],
 assert(budgetTest.status === 0,
   'Linked monthly budget regression failed: ' + (budgetTest.stderr || budgetTest.stdout));
 process.stdout.write(budgetTest.stdout || '');
+const autoTest=spawnSync(process.execPath, ['ci/check-auto-sync.mjs'],
+  {cwd:root,encoding:'utf8'});
+assert(autoTest.status===0,
+  'Automatic linked-finance sync regression failed: '+(autoTest.stderr||autoTest.stdout));
+process.stdout.write(autoTest.stdout||'');
 assert(publish.length >= required.length, 'Unexpectedly small publication set');
 const dest = join(root, 'dist');
 rmSync(dest, { recursive: true, force: true });
