@@ -1,6 +1,6 @@
 /* Rico Finances v1.7.1 — fully offline, rule-based, read-only Analyst.
    No external model/API, network calls, or transaction mutations.
-   Uses the existing 'transactions' and 'selectedDate' variables. */
+   Uses combined read-only Cash Flow transactions (including authorized paid utilities) and selectedDate. */
 (function () {
   'use strict';
   const money = value => formatPHP(value);
@@ -10,7 +10,7 @@
   const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function snapshot(date) {
     const key = monthKey(date);
-    const rows = (Array.isArray(transactions) ? transactions : []).filter(t => t &&
+    const rows = (typeof window.RICO_GET_ALL_CASH_FLOW==='function' ? window.RICO_GET_ALL_CASH_FLOW() : (Array.isArray(transactions)?transactions:[])).filter(t => t &&
       typeof t.date === 'string' && t.date.slice(0,7) === key && /^\d{4}-\d{2}-\d{2}$/.test(t.date) &&
       (t.type === 'income' || t.type === 'expense') && Number.isFinite(Number(t.amount)) && Number(t.amount) > 0);
     const totals = {income:0,expense:0};
