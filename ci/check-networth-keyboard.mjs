@@ -58,7 +58,7 @@ const context={
 };
 context.window=context;context.globalThis=context;
 const vm=createContext(context);
-new Script(readFileSync('net-worth-v1.8.10.js','utf8'),{filename:'net-worth-v1.8.10.js'}).runInContext(vm);
+new Script(readFileSync('net-worth-v1.8.11.js','utf8'),{filename:'net-worth-v1.8.11.js'}).runInContext(vm);
 listeners.get('DOMContentLoaded')();
 const initial=storage.get('rico_finances_ai_net_worth_v1');
 for(const kind of ['asset','liability']){
