@@ -20,11 +20,11 @@
 <link rel="stylesheet" href="linked-panels.css">
 <script src="icons.js"></script>
 <script src="analyst.js" defer></script>
-<script src="net-worth-v1.8.13.js" defer></script>
-<script src="linked-loans-v1.8.13.js" defer></script>
-<script src="linked-budget-v1.8.13.js" defer></script>
-<script src="linked-utilities-v1.8.13.js" defer></script>
-<script src="linked-panels-v1.8.13.js" defer></script>
+<script src="net-worth-v1.8.14.js" defer></script>
+<script src="linked-loans-v1.8.14.js" defer></script>
+<script src="linked-budget-v1.8.14.js" defer></script>
+<script src="linked-utilities-v1.8.14.js" defer></script>
+<script src="linked-panels-v1.8.14.js" defer></script>
 <style>
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:rgba(0,0,0,.1)}
@@ -144,7 +144,8 @@ body.ask-ai-open{overflow:hidden}
 @media(max-height:550px){.rico-chat-compose-area .rico-chat-check small{display:none}.rico-chat-messages{min-height:40px}}
 </style>
 <script src="ai-config.js" defer></script>
-<script src="ask-ai-v1.8.13.js" defer></script>
+<script src="ask-ai-v1.8.14.js" defer></script>
+<script src="backup-manager-v1.8.14.js" defer></script>
 </head>
 <body class="bg-black text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-iosBlue selection:text-white pb-safe">
 
@@ -426,31 +427,21 @@ body.ask-ai-open{overflow:hidden}
 <div id="dataSettingsPanel" role="tabpanel" aria-labelledby="tabDataSettings" hidden>
   <div class="settings-page-header">
     <h2>Data Settings &amp; Updates</h2>
-    <p>Manage your backups and app updates in one place. Your Cash Flow and Net Worth records remain separate and unchanged.</p>
   </div>
-    <!-- Cash Flow data backup and updates (moved, same IDs/actions) -->
   <section class="bg-iosCardDark rounded-3xl p-4 border border-iosBorderDark space-y-3">
-    <h3 class="text-xs font-semibold text-iosGray uppercase tracking-wider">Cash Flow Data & Updates</h3>
-    <p id="lastBackupText" class="text-[11px] text-iosGray">Data is stored on this device only.</p>
+    <h3 class="text-xs font-semibold text-iosGray uppercase tracking-wider">Full App Backup</h3>
     <div class="grid grid-cols-2 gap-2 text-xs">
-      <button onclick="exportData()" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white hover:bg-black/70 transition"><i data-lucide="download" class="w-3.5 h-3.5 text-iosBlue"></i>Export</button>
-      <button onclick="document.getElementById('importFileInput').click()" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white hover:bg-black/70 transition"><i data-lucide="upload" class="w-3.5 h-3.5 text-iosGreen"></i>Import</button>
-      <input type="file" id="importFileInput" onchange="importData(event)" accept=".json" class="hidden">
+      <button type="button" onclick="exportData()" class="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white hover:bg-black/70 transition font-semibold"><i data-lucide="download" class="w-4 h-4 text-iosBlue"></i>Export All</button>
+      <button type="button" onclick="document.getElementById('importFileInput').click()" class="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray3 hover:text-white hover:bg-black/70 transition font-semibold"><i data-lucide="upload" class="w-4 h-4 text-iosGreen"></i>Import All</button>
+      <input type="file" id="importFileInput" onchange="importData(event)" accept=".json,application/json" hidden>
     </div>
-    <button type="button" onclick="copyFromSharedFinances()" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-black/40 border border-iosBorderDark text-iosGray2 hover:text-white transition font-semibold text-xs"><i data-lucide="copy" class="w-3.5 h-3.5"></i>Copy Records from Shared App (This Device)</button>
-    <p class="text-[10px] text-iosGray">Optional: copies records from the original My Finances app only when both apps use the same browser website origin. Does not change the original. Export a backup first.</p>
-    <button onclick="checkForAppUpdates()" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-iosBlue/10 border border-iosBlue/30 text-iosCyan hover:bg-iosBlue/20 transition font-semibold text-xs"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Check for App Update</button>
+    <p id="lastBackupText" class="text-[11px] text-iosGray" aria-live="polite">No backup exported yet.</p>
+    <p class="text-[11px] text-iosGray">Cash Flow, Net Worth and preferences in one file. Connection codes stay private.</p>
+    <p id="netWorthSaveStatus" class="nw-hint" aria-live="polite"></p>
   </section>
-    <section class="nw-card" style="display:flex;flex-direction:column;gap:12px">
-    <strong style="font-size:14px">Net Worth Backup</strong>
-    <div class="nw-actions">
-      <button class="nw-btn" type="button" onclick="exportNetWorth()">Export</button>
-      <button class="nw-btn" type="button" onclick="document.getElementById('nwImportFile').click()">Import</button>
-      <input id="nwImportFile" type="file" accept=".json,application/json" hidden onchange="importNetWorth(event)">
-    </div>
-    <p class="nw-hint">These values stay on this device. This backup is separate from your Cash Flow transaction backup. Save both.</p>
-    <p class="nw-hint">Enter each asset's current value and each debt's outstanding balance. Your Cash Flow running balance is already included automatically as cash (or as a deficit when negative). Avoid entering the same balance manually.</p>
-    <p id="netWorthSaveStatus" aria-live="polite"></p>
+  <section class="bg-iosCardDark rounded-3xl p-4 border border-iosBorderDark space-y-3">
+    <h3 class="text-xs font-semibold text-iosGray uppercase tracking-wider">Updates</h3>
+    <button type="button" onclick="checkForAppUpdates()" class="w-full flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-iosBlue/10 border border-iosBlue/30 text-iosCyan hover:bg-iosBlue/20 transition font-semibold text-xs"><i data-lucide="refresh-cw" class="w-4 h-4"></i>Check for App Update</button>
   </section>
 </div>
 </main>
@@ -464,7 +455,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.13</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.14</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -557,7 +548,7 @@ body.ask-ai-open{overflow:hidden}
       <button type="button" onclick="downloadBackupFile()" style="background:#0a84ff;color:white;font-weight:700;padding:12px;border-radius:14px">Save / Download backup file</button>
       <button type="button" onclick="copyBackupText()" style="background:#36363b;color:white;font-weight:650;padding:12px;border-radius:14px">Copy backup text</button>
     </div>
-    <p style="font-size:11px;line-height:1.5;color:#aeaeb2;margin-top:12px">If downloading does not work in an iPhone Home Screen app, copy the text below into Notes or another document and keep it safe. To restore, save it as a .json file and choose Import. Backup contains your private financial records.</p>
+    <p style="font-size:11px;line-height:1.5;color:#aeaeb2;margin-top:12px">Keep this private file safe. If downloads fail, copy the text and save it as a .json file.</p>
     <textarea id="backupPreviewText" readonly aria-label="Financial backup text" style="margin-top:8px;width:100%;height:100px;box-sizing:border-box;background:#101014;color:#e5e5e5;font-size:11px;border:1px solid #48484a;border-radius:12px;padding:10px"></textarea>
     <button type="button" onclick="confirmBackupSaved()" style="margin-top:12px;width:100%;background:#25392c;color:#9bffb5;font-weight:650;padding:10px;border-radius:14px">I saved a copy</button>
   </div>
@@ -663,7 +654,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.13';
+const RICO_APP_VERSION = '1.8.14';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
@@ -1275,8 +1266,8 @@ function updateBackupInfo() {
   const last = parseInt(localStorage.getItem('rico_finances_ai_last_export') || '0', 10);
   const days = last ? Math.floor((Date.now() - last) / 86400000) : null;
   document.getElementById('lastBackupText').textContent = last
-    ? `Stored on this device only. Last backup: ${new Date(last).toLocaleDateString('en-PH')} (${days} day${days === 1 ? '' : 's'} ago).`
-    : 'Stored on this device only. No backup exported yet.';
+    ? 'Last backup: '+new Date(last).toLocaleDateString('en-PH')
+    : 'No backup exported yet.';
   const banner = document.getElementById('backupBanner');
   if (transactions.length && (!last || days >= 7)) {
     document.getElementById('backupBannerText').textContent = last ? `Last backup was ${days} days ago.` : 'No backup yet. Export a copy of your data.';
@@ -1288,10 +1279,11 @@ function updateBackupInfo() {
 let preparedBackupFile = null;
 let preparedBackupText = '';
 function prepareBackup() {
-  preparedBackupText = JSON.stringify(transactions, null, 2);
-  const filename = `rico_finances_ai_backup_${todayLocal()}.json`;
-  preparedBackupFile = new File([preparedBackupText], filename, {type:'application/json'});
-  document.getElementById('backupPreviewText').value = preparedBackupText;
+  if(!window.RICO_FULL_BACKUP)throw Error('Backup module is unavailable. Reopen the updated app.');
+  preparedBackupText=JSON.stringify(window.RICO_FULL_BACKUP.makePayload(),null,2);
+  const filename='rico-finances-ai-full-backup-'+todayLocal()+'.json';
+  preparedBackupFile=new File([preparedBackupText],filename,{type:'application/json'});
+  document.getElementById('backupPreviewText').value=preparedBackupText;
 }
 function openBackupOptions(message) {
   document.getElementById('backupOptionsMessage').textContent = message ||
@@ -1358,44 +1350,15 @@ async function copyBackupText() {
       : 'Select and copy all the backup text below manually, then save it in a secure note or document.';
   }
 }
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const fr = new FileReader();
-  fr.onload = e => {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if (!Array.isArray(imported)) throw new Error('not an array');
-      if (transactions.length && !confirm(`Replace your ${transactions.length} current transactions with ${imported.length} from the file?`)) return;
-      transactions = imported;
-      renderApp(); updateBackupInfo();
-      alert('Data imported successfully!');
-    } catch (err) { alert('Invalid JSON file format.'); }
-    event.target.value = '';
-  };
-  fr.readAsText(file);
-}
-
-// Explicit, one-time copy. Original shared My Finances data is never changed.
-function copyFromSharedFinances() {
-  let source;
-  try {
-    const raw=localStorage.getItem('rico_finances_txs') || localStorage.getItem('rico_finances_backup_fallback');
-    source=raw ? JSON.parse(raw) : null;
-  } catch (_) { alert('Could not read the old app records. Use Export/Import instead.'); return; }
-  if (!Array.isArray(source) || !source.length) {
-    alert('No shared-app records found in this browser. Use Export from My Finances and Import here. Different iPhone Home Screen apps may have separate storage.'); return;
-  }
-  if (!source.every(t => t && typeof t === 'object' && ['income','expense'].includes(t.type) && Number.isFinite(Number(t.amount)) && t.date && t.category)) {
-    alert('The shared-app records are not in the expected format. Please use Export/Import.'); return;
-  }
-  if (!confirm('Copy ' + source.length + ' transaction(s) from My Finances into Rico Finances AI? This will REPLACE the ' + transactions.length + ' record(s) currently in this private app. Original shared-app data will stay unchanged.')) return;
-  const previous=transactions;
-  try {
-    transactions=JSON.parse(JSON.stringify(source));
-    persistData(); renderApp(); updateBackupInfo();
-    alert('Copied ' + source.length + ' record(s). Please Export a backup from this app too.');
-  } catch (_) { transactions=previous; alert('Could not save the copy. Your original shared-app records remain unchanged.'); }
+async function importData(event) {
+  const input=event.target,file=input.files?.[0];
+  if(!file)return;
+  try{
+    if(!window.RICO_FULL_BACKUP)throw Error('Backup module unavailable. Check for App Update.');
+    await window.RICO_FULL_BACKUP.importFile(file);
+  }catch(error){
+    alert('Import not completed: '+(error?.message||'Invalid backup file')+'. Your current records were not deliberately replaced.');
+  }finally{input.value='';}
 }
 
 function escapeHtml(text) {
