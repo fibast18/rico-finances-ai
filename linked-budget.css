@@ -23,3 +23,5 @@
 .lb-note{font-size:11px;line-height:1.55;color:#a7b3c4}
 #linkedBudgetContent[hidden]{display:none!important}
 @media(max-width:350px){#linkedBudgetCard{padding:11px}.lb-stat{padding:9px}.lb-stat strong{font-size:13px}}
+
+.lb-auto-indicator{font-size:11px;color:#7bf0ac;white-space:nowrap;background:#17352a;border:1px solid #286b4d;border-radius:999px;padding:7px 9px;font-weight:750}
