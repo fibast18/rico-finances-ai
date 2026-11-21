@@ -1,9 +1,9 @@
-// Rico Finances AI offline-first service worker — v1.8.5
+// Rico Finances AI offline-first service worker — v1.8.6
 // Works on GitHub Pages root sites and subdirectory project sites.
-const CACHE_NAME = 'private-rico-ai-shell-v1.8.5';
+const CACHE_NAME = 'private-rico-ai-shell-v1.8.6';
 const CACHE_PREFIX = 'private-rico-ai-shell-';
 const APP_SHELL = [
-  './', './index.html', './styles.css', './net-worth.css', './linked-loans.css', './icons.js', './analyst.js', './net-worth.js', './linked-loans.js', './ai-config.js', './ask-ai-v1.8.3.js',
+  './', './index.html', './styles.css', './net-worth.css', './linked-loans.css', './icons.js', './analyst.js', './net-worth-v1.8.6.js', './linked-loans-v1.8.6.js', './ai-config.js', './ask-ai-v1.8.3.js',
   './manifest.webmanifest', './version.json',
   './my-finances-icon-192.png', './my-finances-icon-512.png', './my-finances-maskable-512.png',
   './my-finances-apple-touch-icon.png', './favicon-48.png'
@@ -84,20 +84,31 @@ self.addEventListener('fetch', event => {
     })());
     return;
   }
-  // Same-origin app files: cache-first, with network recovery for not-yet-cached extras.
+  // Network-first for same-origin app code prevents mixed release scripts on
+  // installed iPhones. An offline device still receives the last cached shell.
+  // Other resources remain cache-first. Never cache cross-origin AI requests.
   event.respondWith((async () => {
     const cache=await caches.open(CACHE_NAME);
-    const cached=await cache.match(request, {ignoreSearch:true});
+    const appCode=/\.(?:js|css)$/.test(url.pathname);
+    if (appCode) {
+      try {
+        const fresh=await fetch(request,{cache:'no-store'});
+        if (!fresh.ok) throw new Error('App code unavailable');
+        if (fresh.type==='basic') await cache.put(request, fresh.clone());
+        return fresh;
+      } catch (_) {
+        return (await cache.match(request,{ignoreSearch:true})) ||
+          new Response('',{status:503,statusText:'App code unavailable offline'});
+      }
+    }
+    const cached=await cache.match(request,{ignoreSearch:true});
     if (cached) return cached;
     try {
       const fresh=await fetch(request);
-      // Cache only same-origin successful responses, without touching other apps.
-      if (fresh.ok && fresh.type === 'basic') {
-        await cache.put(request, fresh.clone());
-      }
+      if (fresh.ok && fresh.type==='basic') await cache.put(request,fresh.clone());
       return fresh;
-    } catch (_error) {
-      return new Response('', {status:503, statusText:'Offline'});
+    } catch (_) {
+      return new Response('',{status:503,statusText:'Offline'});
     }
   })());
 });
