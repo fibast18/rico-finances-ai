@@ -30,7 +30,7 @@
     const count=text('utilityLinkCount'),total=text('utilityLinkTotal');
     if(/live firebase sync/i.test(status))return count+' · '+total;
     if(/offline saved snapshot/i.test(status))return 'Saved: '+total;
-    if(/permission|authorization required|approve|connection failed|not published/i.test(status))return 'Connection needed';
+    if(/permission|authoriz|approve|connection failed|not published/i.test(status))return 'Connection needed';
     if(/connected/i.test(status)&&total)return count+' · '+total;
     return 'Not connected';
    }
