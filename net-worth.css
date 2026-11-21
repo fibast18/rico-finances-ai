@@ -54,10 +54,20 @@ body>main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))!important
 .nw-empty{font-size:12px;color:#9c9ca8;line-height:1.5;padding:12px 0 3px}
 .nw-hint{font-size:11px;line-height:1.55;color:#a7a7b2}
 #netWorthSaveStatus{font-size:11px;line-height:1.4;color:#e2b079}
-#nwDialog{position:fixed;inset:0;z-index:135;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;justify-content:center;padding:14px 12px calc(10px + env(safe-area-inset-bottom,0px));box-sizing:border-box}
-.nw-modal{max-width:430px;width:100%;max-height:calc(92dvh - env(safe-area-inset-top,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;box-sizing:border-box;background:#1d1e22;border:1px solid #414149;padding:18px;border-radius:24px 24px 18px 18px;box-shadow:0 15px 65px #000a}
+/* Size the sheet to the visible viewport, not the page behind the iPhone keyboard. */
+#nwDialog{position:fixed;inset:var(--nw-visible-top,0px) 0 auto 0;
+  height:var(--nw-visible-height,100dvh);max-height:var(--nw-visible-height,100dvh);
+  z-index:135;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;justify-content:center;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));box-sizing:border-box;
+  overflow:hidden;overscroll-behavior:contain}
+.nw-modal{max-width:430px;width:100%;max-height:100%;min-height:0;
+  overflow-y:auto;overscroll-behavior:contain;scroll-padding-top:56px;scroll-padding-bottom:24px;
+  -webkit-overflow-scrolling:touch;box-sizing:border-box;background:#1d1e22;
+  border:1px solid #414149;padding:18px;border-radius:24px 24px 18px 18px;
+  box-shadow:0 15px 65px #000a}
 .nw-modal-title{font-size:18px;font-weight:800}
-.nw-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.nw-modal-head{position:sticky;top:-18px;z-index:2;display:flex;justify-content:space-between;
+  align-items:center;gap:12px;margin-bottom:18px;background:#1d1e22;padding:6px 0}
 .nw-modal-close{width:34px;height:34px;border-radius:50%;background:#33353b;color:#fff;font-size:22px}
 .nw-type-switch{display:grid;grid-template-columns:1fr 1fr;background:#0e0f14;border-radius:13px;padding:4px;gap:4px;margin-bottom:14px}
 .nw-type-switch button{min-height:42px;color:#aaa;border-radius:10px;font-size:13px;font-weight:700}
