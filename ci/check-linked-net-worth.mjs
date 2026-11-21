@@ -54,7 +54,7 @@ const context={
 context.window=context;
 context.globalThis=context;
 const vm=createContext(context);
-for(const file of ['net-worth-v1.8.6.js','linked-loans-v1.8.6.js']){
+for(const file of ['net-worth-v1.8.7.js','linked-loans-v1.8.7.js']){
  new Script(readFileSync(file,'utf8'),{filename:file}).runInContext(vm);
 }
 assert.equal(context.RICO_NET_WORTH.version,context.RICO_LINKED_LOANS.version,'Related modules must match');
@@ -76,4 +76,6 @@ result=context.RICO_NET_WORTH.totals();
 assert.equal(result.liabilities,325,'Unchecking linked A restores manual A while B stays included');
 assert.equal(result.netWorth,175);
 assert.equal(JSON.parse(stored.get('rico_finances_ai_net_worth_v1')).length,3);
+assert.deepEqual(JSON.parse(stored.get('rico_finances_ai_net_worth_v1')).map(x=>x.category),
+ ['Cash / Bank','Personal Loan','Other Debt'],'Legacy Net Worth categories must be preserved');
 console.log('PASS: offline cached balances, live linked selection, manual duplicate protection and Net Worth summary');
