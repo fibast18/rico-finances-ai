@@ -48,8 +48,8 @@ const ctx={
  }
 };
 ctx.window=ctx;
-new Script(readFileSync('linked-budget-v1.8.10.js','utf8'),
- {filename:'linked-budget-v1.8.10.js'}).runInContext(createContext(ctx));
+new Script(readFileSync('linked-budget-v1.8.11.js','utf8'),
+ {filename:'linked-budget-v1.8.11.js'}).runInContext(createContext(ctx));
 for(const cb of listeners.get('DOMContentLoaded')||[])cb();
 assert.equal(requests.length,0,'Offline cached budget must not make network requests');
 assert.equal(get('linkedBudgetContent').hidden,false);
