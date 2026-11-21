@@ -37,8 +37,10 @@ assert(html.includes("RICO_APP_VERSION = '" + version + "'"),
 assert(worker.includes('v' + version),
   'sw.js cache version does not match version.json');
 assert(html.includes('net-worth-v' + version + '.js') &&
-       html.includes('linked-loans-v' + version + '.js'),
-       'Net Worth scripts must have matching versioned filenames');
+       html.includes('linked-loans-v' + version + '.js') &&
+       html.includes('linked-budget-v' + version + '.js') &&
+       html.includes('ask-ai-v' + version + '.js'),
+       'Net Worth, linked budget and Ask AI scripts must match release');
 const shell = worker.match(/const APP_SHELL\s*=\s*\[([\s\S]*?)\];/);
 assert(shell, 'Service worker APP_SHELL not found');
 for (const match of shell[1].matchAll(/['"]\.\/([^'"]*)['"]/g)) {
@@ -76,6 +78,11 @@ const linkedTest = spawnSync(process.execPath, ['ci/check-linked-net-worth.mjs']
 assert(linkedTest.status === 0,
   'Linked Net Worth regression failed: ' + (linkedTest.stderr || linkedTest.stdout));
 process.stdout.write(linkedTest.stdout || '');
+const budgetTest = spawnSync(process.execPath, ['ci/check-linked-budget.mjs'],
+  {cwd:root, encoding:'utf8'});
+assert(budgetTest.status === 0,
+  'Linked monthly budget regression failed: ' + (budgetTest.stderr || budgetTest.stdout));
+process.stdout.write(budgetTest.stdout || '');
 assert(publish.length >= required.length, 'Unexpectedly small publication set');
 const dest = join(root, 'dist');
 rmSync(dest, { recursive: true, force: true });
