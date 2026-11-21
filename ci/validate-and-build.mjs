@@ -112,6 +112,11 @@ const panelsTest=spawnSync(process.execPath,['ci/check-collapsible-panels.mjs'],
 assert(panelsTest.status===0,
   'Cash Flow compact panels regression failed: '+(panelsTest.stderr||panelsTest.stdout));
 process.stdout.write(panelsTest.stdout||'');
+const thirdTabTest=spawnSync(process.execPath,['ci/check-third-tab.mjs'],
+  {cwd:root,encoding:'utf8'});
+assert(thirdTabTest.status===0,
+  'Data Settings/Net Worth disclosure regression failed: '+(thirdTabTest.stderr||thirdTabTest.stdout));
+process.stdout.write(thirdTabTest.stdout||'');
 assert(publish.length >= required.length, 'Unexpectedly small publication set');
 const dest = join(root, 'dist');
 rmSync(dest, { recursive: true, force: true });
