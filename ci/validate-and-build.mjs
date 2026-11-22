@@ -14,7 +14,7 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 const required = [
-  'index.html', 'styles.css', 'icons.js', 'analyst.js',
+  'index.html', 'styles.css', 'icons.js', 'analyst.js', 'financial-planning.js', 'financial-planning.css',
   'ai-config.js', 'sw.js', 'version.json', 'manifest.webmanifest',
   'my-finances-apple-touch-icon.png', 'favicon-48.png',
   'my-finances-icon-192.png', 'my-finances-icon-512.png',
@@ -80,6 +80,9 @@ for (const file of publish.filter(name => name.endsWith('.png'))) {
   const sig = readFileSync(join(root, file)).subarray(0, 8).toString('hex');
   assert(sig === '89504e470d0a1a0a', 'Invalid PNG file: ' + file);
 }
+const planningTest=spawnSync(process.execPath,['ci/check-financial-planning.mjs'],{cwd:root,encoding:'utf8'});
+assert(planningTest.status===0,'Planning regression failed: '+(planningTest.stderr||planningTest.stdout));
+process.stdout.write(planningTest.stdout||'');
 const linkedTest = spawnSync(process.execPath, ['ci/check-linked-net-worth.mjs'],
   {cwd:root, encoding:'utf8'});
 assert(linkedTest.status === 0,
