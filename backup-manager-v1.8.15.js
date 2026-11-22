@@ -103,7 +103,7 @@
    netWorth:{items:net},
    personalization:preferences,
    linkedCache:linked,
-   financialPlanning:window.RICO_FINANCIAL_PLAN?.exportState?.()??{reserve:0,essential:0,goals:[],snapshots:[]}
+   ...(window.RICO_FINANCIAL_PLAN?.exportState?{financialPlanning:window.RICO_FINANCIAL_PLAN.exportState()}:{})
   };
  }
  function planImport(data) {
