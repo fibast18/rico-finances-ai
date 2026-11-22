@@ -1,4 +1,4 @@
-/* Rico Finances AI v1.8.18. Offline financial planning, separate from actual records. */
+/* Rico Finances AI v1.8.19. Offline financial planning, separate from actual records. */
 (()=>{'use strict';
 const KEY='rico_finances_ai_planning_v1',HISTORY='rico-fin-health-history-v1',$=id=>document.getElementById(id);
 const php=n=>new Intl.NumberFormat('en-PH',{style:'currency',currency:'PHP'}).format(n);
@@ -100,7 +100,7 @@ function render(){
  '<div class="fps-fields"><label>Emergency reserves (₱)<input id="fpsReserve" type="number" min="0" step=".01" value="'+state.reserve+'"></label><label>Essential monthly expenses (₱)<input id="fpsEssential" type="number" min="0" step=".01" value="'+state.essential+'"></label></div>'+
  '<button data-save-reserve type="button">Save emergency fund</button><p class="fps-note">Enter amounts yourself. Monitoring only; no new Cash Flow or Net Worth records.</p></div></details>'+
  '<details id="fpsTwo"><summary>2 · Financial Goals Tracker</summary><div class="fps-body">'+
- (state.goals.map(g=>'<div class="fps-goal"><div><b>'+clean(g.name)+'</b><small>'+php(g.saved)+' of '+php(g.target)+(g.deadline?' · '+clean(g.deadline):'')+'</small><progress max="100" value="'+Math.min(100,g.saved/g.target*100)+'"></progress></div><button type="button" data-delete-goal="'+clean(g.id)+'">Delete</button></div>').join('')||'<p class="fps-note">No goals saved yet.</p>')+
+ (state.goals.map(g=>'<div class="fps-goal"><div><b>'+clean(g.name)+'</b><small>'+php(g.saved)+' of '+php(g.target)+(g.deadline?' · '+clean(g.deadline):'')+'</small><progress max="100" value="'+Math.min(100,g.saved/g.target*100)+'"></progress></div><span><button type="button" data-update-goal="'+clean(g.id)+'">Update saved</button> <button type="button" data-delete-goal="'+clean(g.id)+'">Delete</button></span></div>').join('')||'<p class="fps-note">No goals saved yet.</p>')+
  '<div class="fps-fields"><label>Goal name<input id="fpsGoalName" maxlength="80" placeholder="e.g. Education"></label><label>Target (₱)<input id="fpsGoalTarget" type="number" min=".01" step=".01"></label><label>Saved (₱)<input id="fpsGoalSaved" type="number" min="0" step=".01"></label><label>Target date<input id="fpsGoalDeadline" type="date"></label></div>'+
  '<button type="button" data-add-goal>Add goal</button><p class="fps-note">Planning balances are separate from assets and transactions.</p></div></details>'+
  '<details id="fpsThree"><summary>3 · Cash Flow Forecast</summary><div class="fps-body">'+
@@ -133,6 +133,15 @@ function bind(){
     const id=window.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
     save({...state,goals:[...state.goals,{id,name,target:Number(target),saved:Number(saved),deadline}]});
     ['fpsGoalName','fpsGoalTarget','fpsGoalSaved','fpsGoalDeadline'].forEach(x=>$(x).value='');
+   }
+   if(b.hasAttribute('data-update-goal')){
+    const id=b.getAttribute('data-update-goal'),goal=state.goals.find(g=>g.id===id);
+    if(!goal)throw Error('Goal no longer exists.');
+    const entry=prompt('Update the amount saved for '+goal.name+' (PHP):',String(goal.saved));
+    if(entry!==null){
+     if(!money(entry))throw Error('Enter a valid non-negative amount.');
+     save({...state,goals:state.goals.map(g=>g.id===id?{...g,saved:Number(entry)}:g)});
+    }
    }
    if(b.hasAttribute('data-delete-goal')){
     if(confirm('Delete this goal?'))save({...state,goals:state.goals.filter(g=>g.id!==b.getAttribute('data-delete-goal'))});
