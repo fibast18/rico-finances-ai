@@ -72,8 +72,11 @@
    const linked=window.RICO_LINKED_LOANS;
    const snap=linked?.snapshot||null;
    const selected=new Set(Array.isArray(snap?.selected)?snap.selected:[]);
-   const loans=Array.isArray(snap?.loans)?snap.loans.filter(row=>
-     selected.has(row.id)&&Number.isFinite(row.balance)&&row.balance>0):[];
+   const availableLoans=Array.isArray(snap?.loans)?snap.loans.filter(row=>
+     Number.isFinite(row.balance)&&row.balance>0):[];
+   const loans=availableLoans.filter(row=>selected.has(row.id));
+   const otherLoans=availableLoans.filter(row=>!selected.has(row.id));
+   const availableLoanTotal=nice(availableLoans.reduce((sum,row)=>sum+row.balance,0));
    const loanTotal=worth?Number(worth.linkedDebt)||0:
      nice(loans.reduce((sum,row)=>sum+row.balance,0));
    const loanStale=!!snap?.fetchedAt&&
@@ -82,9 +85,15 @@
    const budget=window.RICO_LINKED_BUDGET?.analysisBudget?.(month)||null;
    const utilityLink=window.RICO_UTILITY_LINK;
    const utilityConnected=utilityLink?.connected===true;
-   return {worth,manual,loans,loanTotal,loanStale,loanAsOf:snap?.asOf||'',
-     loanAvailable:!!snap,budget,
-     utilityConnected,utilitySnapshot:!!utilityLink?.linkedRows?.length,
+   const utilityRows=Array.isArray(utilityLink?.linkedRows)?utilityLink.linkedRows:[];
+   const utilityMonth=utilityRows.filter(row=>row?.date?.slice(0,7)===month);
+   // Only the merged Cash Flow source establishes which paid utilities count as expenses.
+   const includedUtilityIds=new Set(allRows().filter(row=>row?.linkedUtility===true).map(row=>row.id));
+   const utilityExcluded=utilityMonth.filter(row=>!includedUtilityIds.has(row.id));
+   return {worth,manual,loans,otherLoans,availableLoans,availableLoanTotal,
+     loanTotal,loanStale,loanAsOf:snap?.asOf||'',loanAvailable:!!snap,budget,
+     utilityConnected,utilityRows,utilityMonth,utilityExcluded,includedUtilityIds,
+     utilitySnapshot:utilityRows.length>0,
      worthSource:worth?'Calculated from current local data and selected linked loans':'Net Worth not available'};
  }
  function lastSix(date) {
@@ -149,6 +158,13 @@
        info.loans.length+' selected Loan Tracker loan'+(info.loans.length===1?'':'s')+
        ' total '+money(info.loanTotal)+' in estimated outstanding balances.'+
        (info.loanStale?' Last cached balances may be outdated.':'')]);
+   }else if(info.availableLoans.length){
+     notes.push(['Loan records found but not selected',
+       info.availableLoans.length+' outstanding linked loans were received, but none are selected for Net Worth. Check their boxes in the Net Worth screen.']);
+   }
+   if(!now.utilityCount&&info.utilityRows.length){
+     notes.push(['Paid utility records found',
+       info.utilityRows.length+' linked paid records exist, but none are included in '+now.label+' Cash Flow. Check the bill dates and inclusion settings.']);
    }
    return notes.slice(0,8);
  }
@@ -263,6 +279,14 @@
      escape(money(s.expense))+'</span></div>').join('');
  }
  let lastQuestion='';
+ function highlightQuestion(){
+   const buttons=document.querySelectorAll?.('#aiAnalystSection .ai-question-grid button')||[];
+   for(const button of buttons){
+     const active=!!lastQuestion&&button.dataset?.analystQuestion===lastQuestion;
+     button.classList?.toggle?.('ai-question-selected',active);
+     button.setAttribute?.('aria-pressed',String(active));
+   }
+ }
  function render(){
    const main=$('aiAnalystSection');if(!main)return;
    const date=typeof selectedDate!=='undefined'?selectedDate:new Date();
@@ -302,6 +326,7 @@
      .map(([head,body])=>insight(head,body)).join('');
    $('aiAnalystTrend').innerHTML=trendHtml(history);
    $('aiAnalystBreakdown').innerHTML=analysisSections(now,info);
+   highlightQuestion();
    const answer=$('aiAnalystAnswer');
    if(answer)answer.textContent=lastQuestion?
      quickAnswer(lastQuestion,now,prior,info,history):
@@ -314,10 +339,11 @@
  };
  window.askFinanceAnalyst=question=>{
    lastQuestion=question;
+   highlightQuestion();
    const date=typeof selectedDate!=='undefined'?selectedDate:new Date();
    const now=snapshot(date),prior=snapshot(previous(date));
    const answer=$('aiAnalystAnswer');
    if(answer)answer.textContent=quickAnswer(question,now,prior,integrated(date),lastSix(date));
  };
- window.RICO_ANALYST_TEST={snapshot,integrated,lastSix,findings,quickAnswer};
+ window.RICO_ANALYST_TEST={snapshot,integrated,lastSix,findings,quickAnswer,highlightQuestion};
 })();
