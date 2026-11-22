@@ -1,9 +1,9 @@
-// Rico Finances AI offline-first service worker — v1.8.17
+// Rico Finances AI offline-first service worker — v1.8.18
 // Works on GitHub Pages root sites and subdirectory project sites.
-const CACHE_NAME = 'private-rico-ai-shell-v1.8.17';
+const CACHE_NAME = 'private-rico-ai-shell-v1.8.18';
 const CACHE_PREFIX = 'private-rico-ai-shell-';
 const APP_SHELL = [
-  './', './index.html', './styles.css', './financial-health.css', './financial-health.js', './net-worth.css', './linked-loans.css', './linked-budget.css', './icons.js', './analyst.js', './net-worth-v1.8.15.js', './linked-loans-v1.8.15.js', './linked-budget-v1.8.15.js', './linked-utilities.css', './linked-utilities-v1.8.15.js', './linked-panels.css', './linked-panels-v1.8.15.js', './ai-config.js', './ask-ai-v1.8.15.js', './backup-manager-v1.8.15.js',
+  './', './index.html', './styles.css', './financial-health.css', './financial-health.js', './financial-planning.css', './financial-planning.js', './net-worth.css', './linked-loans.css', './linked-budget.css', './icons.js', './analyst.js', './net-worth-v1.8.15.js', './linked-loans-v1.8.15.js', './linked-budget-v1.8.15.js', './linked-utilities.css', './linked-utilities-v1.8.15.js', './linked-panels.css', './linked-panels-v1.8.15.js', './ai-config.js', './ask-ai-v1.8.15.js', './backup-manager-v1.8.15.js',
   './manifest.webmanifest', './version.json',
   './my-finances-icon-192.png', './my-finances-icon-512.png', './my-finances-maskable-512.png',
   './my-finances-apple-touch-icon.png', './favicon-48.png'
