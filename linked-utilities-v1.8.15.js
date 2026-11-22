@@ -83,6 +83,7 @@
   }
   render();
   if(old!==JSON.stringify(rows))window.RICO_RENDER_CASH_FLOW?.();
+  window.RICO_ANALYST_REFRESH?.();
  }
  function saveExclusions(){
   try{localStorage.setItem(EXCLUDE_KEY,JSON.stringify([...excluded]));}
@@ -148,7 +149,7 @@
    check.setAttribute('aria-label','Include '+entry.desc+' on '+entry.date);
    check.addEventListener('change',()=>{
     if(check.checked)excluded.delete(entry.sourceId);else excluded.add(entry.sourceId);
-    saveExclusions();render();window.RICO_RENDER_CASH_FLOW?.();
+    saveExclusions();render();window.RICO_RENDER_CASH_FLOW?.();window.RICO_ANALYST_REFRESH?.();
    });
    const label=document.createElement('span');label.textContent=entry.desc+' · '+entry.date;
    const amount=document.createElement('strong');amount.textContent=money(entry.amount);
