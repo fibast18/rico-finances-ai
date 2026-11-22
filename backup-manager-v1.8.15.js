@@ -102,7 +102,8 @@
    cashFlow:{transactions:cash},
    netWorth:{items:net},
    personalization:preferences,
-   linkedCache:linked
+   linkedCache:linked,
+   financialPlanning:window.RICO_FINANCIAL_PLAN?.exportState?.()??{reserve:0,essential:0,goals:[],snapshots:[]}
   };
  }
  function planImport(data) {
@@ -139,6 +140,11 @@
      if(value!==null)changes.set(K[name],JSON.stringify(value));
      // A missing snapshot does not disconnect an existing authorized device.
     }
+   }
+   if(own(data,'financialPlanning')&&data.financialPlanning!==null){
+    const planning=window.RICO_FINANCIAL_PLAN?.validate?.(data.financialPlanning);
+    if(!planning)throw Error('Financial Planning module unavailable.');
+    changes.set('rico_finances_ai_planning_v1',JSON.stringify(planning));
    }
    kind='full app backup';countCash=cash.length;countNet=net.length;
   }
