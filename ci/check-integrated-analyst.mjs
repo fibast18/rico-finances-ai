@@ -114,4 +114,53 @@ rows.push({id:6,date:'2026-10-21',type:'expense',amount:3000,
 ctx.renderFinanceAnalyst();
 assert(!get('aiAnalystHighlights').innerHTML.includes('<img'));
 assert(!get('aiAnalystBreakdown').innerHTML.includes('<script>'));
+// Regression: connected link data may exist without being selected or dated this month.
+// Such records must remain visible as linked information but never inflate actual spending/debt.
+ctx.selectedDate=new Date(2026,10,1);
+ctx.RICO_GET_ALL_CASH_FLOW=()=>rows.filter(r=>!r.linkedUtility);
+ctx.RICO_NET_WORTH={totals:()=>({assets:100000,liabilities:20000,netWorth:80000,linkedDebt:0}),manualItems:()=>[]};
+ctx.RICO_LINKED_LOANS={snapshot:{
+ asOf:'2026-11-22',fetchedAt:new Date().toISOString(),selected:[],
+ loans:[{id:'A',name:'Loan A',balance:12000},{id:'B',name:'Loan B',balance:8000}]
+}};
+ctx.RICO_UTILITY_LINK={connected:true,linkedRows:[{
+ id:'util:sept-electric',sourceId:'sept-electric',type:'expense',date:'2026-09-05',
+ amount:2500,desc:'Electricity · Home Utilities',linkedUtility:true
+}]};
+const absentIncluded=ctx.RICO_ANALYST_TEST.integrated(ctx.selectedDate);
+assert.equal(absentIncluded.loans.length,0);
+assert.equal(absentIncluded.availableLoans.length,2);
+assert.equal(absentIncluded.availableLoanTotal,20000);
+assert.equal(absentIncluded.utilityRows.length,1);
+ctx.renderFinanceAnalyst();
+assert.match(get('aiAnalystBreakdown').innerHTML,/Loan A · not selected/);
+assert.match(get('aiAnalystBreakdown').innerHTML,/Latest bill\/record date: 2026-09-05/);
+ctx.askFinanceAnalyst('loans');
+assert.match(get('aiAnalystAnswer').textContent,/none are currently selected for Net Worth/);
+assert.match(get('aiAnalystAnswer').textContent,/₱20000\.00/);
+ctx.askFinanceAnalyst('utilities');
+assert.match(get('aiAnalystAnswer').textContent,/Latest bill\/record date: 2026-09-05/);
+ctx.RICO_UTILITY_LINK.linkedRows=[{
+ id:'util:nov-electric',sourceId:'nov-electric',type:'expense',date:'2026-11-05',
+ amount:3200,desc:'Electricity · Home Utilities',linkedUtility:true
+}];
+ctx.renderFinanceAnalyst();
+assert.match(get('aiAnalystBreakdown').innerHTML,/not included/);
+ctx.askFinanceAnalyst('utilities');
+assert.match(get('aiAnalystAnswer').textContent,/none are included in Cash Flow/);
+assert.match(get('aiAnalystAnswer').textContent,/₱3200\.00/);
+// Selected question highlights are semantic (aria-pressed) as well as visual.
+assert.match(html,/data-analyst-question="loans" aria-pressed="false"/);
+const active=[];
+ctx.document.querySelectorAll=()=>['loans','utilities','budget'].map(value=>({
+ dataset:{analystQuestion:value},
+ classList:{toggle:(className,enabled)=>{if(enabled)active.push(value);}},
+ setAttribute:(name,value)=>{if(name==='aria-pressed'&&value==='true')active.push('pressed:'+value);}
+}));
+ctx.askFinanceAnalyst('loans');
+assert(active.includes('loans'));
+assert(active.includes('pressed:loans')===false || active.includes('pressed:true'));
+// Unselected outstanding loans do not affect the selected Net Worth snapshot.
+assert.equal(ctx.RICO_ANALYST_TEST.integrated(ctx.selectedDate).loanTotal,0);
+
 console.log('PASS: integrated offline Analyst, Net Worth, selected loans, budget plan, paid utility dedupe, six-month trends, source gaps and safe rendering');

@@ -84,6 +84,8 @@ body.personalization-open,body.ai-analyst-open{overflow:hidden;touch-action:pan-
 #aiAnalystSection .ai-source-row strong{white-space:nowrap;text-align:right;font-size:11px;color:#f0e4ff;font-variant-numeric:tabular-nums}
 #aiAnalystSection .ai-analyst-smallnote{font-size:10px;color:#a9a2b6;line-height:1.5;margin:6px 1px}
 #aiAnalystSection .ai-analyst-expanded{max-width:100%;overflow-wrap:anywhere}
+#aiAnalystSection .ai-question-grid button.ai-question-selected{background:#67418a!important;border-color:#d5a2ff!important;color:#fff!important;box-shadow:0 0 0 2px rgba(205,148,255,.28),inset 0 0 0 1px rgba(255,255,255,.2)!important;font-weight:800}
+#aiAnalystSection .ai-question-grid button:focus-visible{outline:2px solid #e7baff;outline-offset:2px}
 @media(min-width:650px){#aiAnalystSection .ai-metric-grid{grid-template-columns:repeat(4,minmax(0,1fr))}#aiAnalystSection .ai-question-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#aiAnalystSection .ai-analyst-findings{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.ai-analyst-dialog{padding:0!important}.ai-analyst-modal-panel{width:100vw;max-width:none;height:100dvh;max-height:100dvh;border-radius:0}.ai-analyst-panel{border-radius:0!important;min-height:100%;box-sizing:border-box;padding:calc(12px + env(safe-area-inset-top,0px)) 14px calc(20px + env(safe-area-inset-bottom,0px))!important}#aiAnalystSection .ai-analyst-heading{top:calc(-12px - env(safe-area-inset-top,0px));padding:9px 0}}
 
@@ -480,7 +482,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.19</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.20</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -517,15 +519,15 @@ body.ask-ai-open{overflow:hidden}
         <div id="aiAnalystBreakdown" class="ai-breakdown"></div>
         <h3 class="ai-analyst-minititle">Ask about your finances</h3>
         <div class="ai-question-grid" role="group" aria-label="Ask financial analyst">
-          <button type="button" onclick="askFinanceAnalyst('summary')">Cash flow</button>
-          <button type="button" onclick="askFinanceAnalyst('networth')">Net Worth</button>
-          <button type="button" onclick="askFinanceAnalyst('loans')">Loans</button>
-          <button type="button" onclick="askFinanceAnalyst('budget')">Family budget</button>
-          <button type="button" onclick="askFinanceAnalyst('utilities')">Paid utilities</button>
-          <button type="button" onclick="askFinanceAnalyst('spending')">Top spending</button>
-          <button type="button" onclick="askFinanceAnalyst('compare')">Last month</button>
-          <button type="button" onclick="askFinanceAnalyst('trend')">6-month trend</button>
-          <button type="button" onclick="askFinanceAnalyst('savings')">Saving ideas</button>
+          <button type="button" data-analyst-question="summary" aria-pressed="false" onclick="askFinanceAnalyst('summary')">Cash flow</button>
+          <button type="button" data-analyst-question="networth" aria-pressed="false" onclick="askFinanceAnalyst('networth')">Net Worth</button>
+          <button type="button" data-analyst-question="loans" aria-pressed="false" onclick="askFinanceAnalyst('loans')">Loans</button>
+          <button type="button" data-analyst-question="budget" aria-pressed="false" onclick="askFinanceAnalyst('budget')">Family budget</button>
+          <button type="button" data-analyst-question="utilities" aria-pressed="false" onclick="askFinanceAnalyst('utilities')">Paid utilities</button>
+          <button type="button" data-analyst-question="spending" aria-pressed="false" onclick="askFinanceAnalyst('spending')">Top spending</button>
+          <button type="button" data-analyst-question="compare" aria-pressed="false" onclick="askFinanceAnalyst('compare')">Last month</button>
+          <button type="button" data-analyst-question="trend" aria-pressed="false" onclick="askFinanceAnalyst('trend')">6-month trend</button>
+          <button type="button" data-analyst-question="savings" aria-pressed="false" onclick="askFinanceAnalyst('savings')">Saving ideas</button>
         </div>
         <p id="aiAnalystAnswer" class="ai-analyst-answer" role="status">Choose a question to see an explanation based on your records.</p>
       </div>
@@ -691,7 +693,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.19';
+const RICO_APP_VERSION = '1.8.20';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {

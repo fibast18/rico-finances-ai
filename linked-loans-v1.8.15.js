@@ -62,7 +62,7 @@
    check.setAttribute('aria-label','Include '+loan.name+' in Net Worth');
    check.addEventListener('change',()=>{
     if(check.checked)selected.add(loan.id);else selected.delete(loan.id);
-    save();window.RICO_NET_WORTH?.render();
+    save();window.RICO_NET_WORTH?.render();window.RICO_ANALYST_REFRESH?.();
    });
    const label=document.createElement('span');label.className='nw-link-name';label.textContent=loan.name;
    const value=document.createElement('strong');value.textContent=money(loan.balance);
@@ -120,6 +120,7 @@
    window.RICO_LINKED_BUDGET?.acceptSnapshot?.(response,month);
    if(changed)window.RICO_NET_WORTH?.render();
    else render(); // Refresh the last-checked timestamp without changing totals.
+   window.RICO_ANALYST_REFRESH?.();
    setStatus('Auto-sync on (about 30 sec) · Last checked '+fmtDate(data.fetchedAt)+
      ' · Balances as of '+data.asOf+' · Read-only estimates');
   }catch(e){
