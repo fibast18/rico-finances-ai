@@ -36,9 +36,10 @@ assert(body.classList.contains('transaction-modal-open'),'FAB should hide as ent
 assert(!modal.classList.contains('hidden'));
 ctx.closeModal();
 assert(body.classList.contains('transaction-modal-open'),'FAB must remain hidden during close animation');
-const firstClose=[...scheduled.values()].find(x=>x.ms===300);
+const firstClose=[...scheduled.entries()].find(([id,task])=>task.ms===300);
 assert(firstClose,'Modal closing timer missing');
-firstClose.fn();
+scheduled.delete(firstClose[0]);
+firstClose[1].fn();
 assert(!body.classList.contains('transaction-modal-open'),'FAB should return after sheet closes');
 assert(modal.classList.contains('hidden'));
 ctx.showModal();ctx.closeModal();ctx.showModal();
