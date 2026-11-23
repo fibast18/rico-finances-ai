@@ -56,7 +56,10 @@
 #appHeader .app-header-secondary{display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;margin:0;min-height:0}
 #appHeader #syncStatusBadge{width:auto;max-width:max-content;white-space:nowrap;padding:5px 8px;font-size:10px}
 .floating-add-btn{position:fixed!important;left:auto!important;right:18px!important;bottom:calc(24px + env(safe-area-inset-bottom,0px))!important;z-index:45!important;display:flex!important;width:66px!important;height:66px!important;border-radius:50%!important;align-items:center!important;justify-content:center!important;background:#0a84ff!important;color:#fff!important;border:1px solid rgba(255,255,255,.24);box-shadow:0 9px 30px rgba(10,132,255,.42)!important;cursor:pointer;touch-action:manipulation;transition:transform .15s ease,box-shadow .15s ease}
-.floating-add-btn:active{transform:scale(.94)}.floating-add-btn svg{width:32px!important;height:32px!important;stroke-width:2.5}
+.floating-add-btn:active{transform:scale(.94)}
+/* Entry sheets must never be obscured by the global Add button, even if display:flex!important is set. */
+body.transaction-modal-open .floating-add-btn,body.nw-modal-open .floating-add-btn{display:none!important}
+.floating-add-btn svg{width:32px!important;height:32px!important;stroke-width:2.5}
 body>main{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}
 .personalization-dialog{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));box-sizing:border-box}
 .personalization-dialog.hidden{display:none!important}
@@ -482,7 +485,7 @@ body.ask-ai-open{overflow:hidden}
 
 <footer class="max-w-md mx-auto w-full px-4 py-4 text-center">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iosCardDark border border-iosBorderDark text-[11px] text-iosGray">
-    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.20</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-iosGreen"></span><span id="footerAppName">Rico Finances AI</span><span class="text-iosGray2 font-medium">v1.8.21</span>
   </div>
   <p class="text-[10px] text-iosGray/60 mt-1.5">Personal finance tracker &bull; 210 Borderless Sports Actions</p>
   <p id="developerCredit" class="mt-2 text-[11px] text-iosGray2 font-medium">Developed by: Engr. Rico J. Pono</p>
@@ -693,7 +696,7 @@ body.ask-ai-open{overflow:hidden}
 </div>
 
 <script>
-const RICO_APP_VERSION = '1.8.20';
+const RICO_APP_VERSION = '1.8.21';
 let appServiceWorkerRegistration = null;
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
@@ -1229,9 +1232,15 @@ function createOfflineDonutChart(canvas, values, colors, labels) {
   return { destroy() { disposed=true; if(observer)observer.disconnect();else window.removeEventListener('resize',draw); } };
 }
 
+let transactionModalCloseTimer = null;
 function showModal() {
   const modal = document.getElementById('transactionModal');
+  if (transactionModalCloseTimer !== null) {
+    clearTimeout(transactionModalCloseTimer);
+    transactionModalCloseTimer = null;
+  }
   modal.classList.remove('hidden');
+  document.body.classList.add('transaction-modal-open');
   setTimeout(() => { modal.classList.remove('opacity-0'); modal.children[0].classList.remove('translate-y-full'); }, 10);
 }
 function openModal() {
@@ -1246,7 +1255,16 @@ function openModal() {
 function closeModal() {
   const modal = document.getElementById('transactionModal');
   modal.children[0].classList.add('translate-y-full'); modal.classList.add('opacity-0');
-  setTimeout(() => { modal.classList.add('hidden'); document.getElementById('txForm').reset(); document.getElementById('editingTxId').value = ''; document.getElementById('txDate').value = todayLocal(); setTxType('expense'); }, 300);
+  if (transactionModalCloseTimer !== null) clearTimeout(transactionModalCloseTimer);
+  transactionModalCloseTimer = setTimeout(() => {
+    modal.classList.add('hidden');
+    document.body.classList.remove('transaction-modal-open');
+    document.getElementById('txForm').reset();
+    document.getElementById('editingTxId').value = '';
+    document.getElementById('txDate').value = todayLocal();
+    setTxType('expense');
+    transactionModalCloseTimer = null;
+  }, 300);
 }
 function setTxType(type) {
   currentTxType = type;

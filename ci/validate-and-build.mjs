@@ -80,6 +80,9 @@ for (const file of publish.filter(name => name.endsWith('.png'))) {
   const sig = readFileSync(join(root, file)).subarray(0, 8).toString('hex');
   assert(sig === '89504e470d0a1a0a', 'Invalid PNG file: ' + file);
 }
+const addButtonTest=spawnSync(process.execPath,['ci/check-modal-add-button.mjs'],{cwd:root,encoding:'utf8'});
+assert(addButtonTest.status===0,'Floating Add button regression failed: '+(addButtonTest.stderr||addButtonTest.stdout));
+process.stdout.write(addButtonTest.stdout||'');
 const planningTest=spawnSync(process.execPath,['ci/check-financial-planning.mjs'],{cwd:root,encoding:'utf8'});
 assert(planningTest.status===0,'Planning regression failed: '+(planningTest.stderr||planningTest.stdout));
 process.stdout.write(planningTest.stdout||'');
